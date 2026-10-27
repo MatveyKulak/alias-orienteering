@@ -4,30 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Алиас: Спортивное ориентирование</title>
-    <meta name="description" content="Автономная веб-игра в слова по спортивному ориентированию и знакам IOF для тренировок и командных раундов." />
+    <meta name="description" content="Автономная командная веб-игра в слова по спортивному ориентированию и знакам ISSprOM 2019-2." />
     <meta property="og:title" content="Алиас: Спортивное ориентирование" />
-    <meta property="og:description" content="Автономная веб-игра в слова по спортивному ориентированию и знакам IOF для тренировок и командных раундов." />
+    <meta property="og:description" content="Автономная командная веб-игра в слова по спортивному ориентированию и знакам ISSprOM 2019-2." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <style>
-      /* --- Базовые переменные и стили (Цветовая гамма IOF и спортивного ориентирования) --- */
+      /* --- Переменные и палитра ориентирования (ISSprOM) --- */
       :root {
         --iof-orange: #f97316;
         --iof-orange-hover: #ea580c;
-        --iof-orange-dark: #c2410c;
         --forest-green: #15803d;
-        --forest-green-hover: #166534;
-        --forest-green-light: #dcfce7;
+        --forest-green-light: #22c55e;
         --skip-red: #ef4444;
-        --skip-red-hover: #dc2626;
-        --skip-red-light: #fee2e2;
         --bg-main: #0f172a;
         --surface-card: #1e293b;
         --surface-elevated: #334155;
+        --surface-input: #0b1120;
         --text-primary: #f8fafc;
         --text-secondary: #94a3b8;
         --text-muted: #64748b;
         --border-subtle: rgba(255, 255, 255, 0.1);
+        --team-1: #f97316;
+        --team-2: #10b981;
+        --team-3: #3b82f6;
+        --team-4: #a855f7;
         --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       }
 
@@ -50,10 +51,10 @@
         overflow-x: hidden;
       }
 
-      /* Призма ориентирования (Контрольный пункт: бело-оранжевый треугольник) */
+      /* Призма ориентирования */
       .iof-prism-icon {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         position: relative;
         overflow: hidden;
         border-radius: 4px;
@@ -68,7 +69,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 20px;
+        padding: 10px 18px;
         background-color: rgba(15, 23, 42, 0.95);
         border-bottom: 1px solid var(--border-subtle);
         position: sticky;
@@ -80,22 +81,22 @@
       .brand {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       .brand-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
+        font-size: 1.05rem;
+        font-weight: 800;
         color: var(--text-primary);
+        line-height: 1.15;
       }
 
       .brand-badge {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 600;
         color: var(--iof-orange);
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.04em;
       }
 
       .header-actions {
@@ -109,8 +110,8 @@
         border: 1px solid var(--border-subtle);
         border-radius: 8px;
         color: var(--text-secondary);
-        width: 38px;
-        height: 38px;
+        width: 36px;
+        height: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -121,18 +122,17 @@
       .icon-btn:hover {
         color: var(--text-primary);
         background-color: var(--surface-card);
-        border-color: rgba(255, 255, 255, 0.2);
       }
 
-      /* Контейнер экранов */
+      /* Контейнер приложения */
       main {
         flex: 1;
         display: flex;
         flex-direction: column;
-        max-width: 680px;
+        max-width: 600px;
         width: 100%;
         margin: 0 auto;
-        padding: 16px 20px;
+        padding: 14px 16px;
         position: relative;
       }
 
@@ -141,7 +141,7 @@
         flex-direction: column;
         flex: 1;
         width: 100%;
-        animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .screen.active {
@@ -149,186 +149,297 @@
       }
 
       @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(6px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Кнопки и общие элементы */
+      .btn-primary {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #ffffff;
+        background-color: var(--iof-orange);
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      .btn-secondary {
+        background-color: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .btn-secondary:hover {
+        background-color: var(--surface-elevated);
+        color: var(--text-primary);
+      }
+
+      .btn-danger-outline {
+        background: transparent;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #f87171;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
       }
 
       /* --- ЭКРАН 1: НАСТРОЙКИ --- */
       .settings-card {
         background-color: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 16px;
-        padding: 28px 24px;
+        border-radius: 18px;
+        padding: 22px 18px;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        margin-top: auto;
-        margin-bottom: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
       }
 
-      .hero-section {
-        text-align: center;
-        margin-bottom: 28px;
+      .resume-banner {
+        background: rgba(249, 115, 22, 0.12);
+        border: 1px solid rgba(249, 115, 22, 0.3);
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
       }
 
-      .hero-flag {
-        display: inline-block;
-        margin-bottom: 14px;
+      .resume-banner span {
+        font-size: 0.85rem;
+        color: #fed7aa;
+        font-weight: 600;
       }
 
-      .hero-title {
-        font-size: 1.75rem;
-        font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
-      }
-
-      .hero-desc {
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-        line-height: 1.5;
-        max-width: 440px;
-        margin: 0 auto;
-      }
-
-      .setting-group {
-        margin-bottom: 24px;
+      .resume-btn {
+        background-color: var(--iof-orange);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
       }
 
       .setting-label {
         display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--text-secondary);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
       }
 
       .segmented-control {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        background-color: var(--bg-main);
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 6px;
+        background-color: var(--surface-input);
         padding: 4px;
         border-radius: 12px;
         border: 1px solid var(--border-subtle);
       }
 
-      .time-btn {
+      .segment-btn {
         background: transparent;
         border: none;
         border-radius: 8px;
-        padding: 12px 8px;
-        font-size: 1rem;
+        padding: 10px 6px;
+        font-size: 0.9rem;
         font-weight: 700;
         color: var(--text-secondary);
         cursor: pointer;
         transition: all 0.15s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
+        text-align: center;
       }
 
-      .time-btn span {
-        font-size: 0.7rem;
-        font-weight: 500;
-        color: var(--text-muted);
-      }
-
-      .time-btn.active {
+      .segment-btn.active {
         background-color: var(--surface-card);
         color: var(--iof-orange);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
       }
 
-      .time-btn.active span {
-        color: var(--text-secondary);
-      }
-
-      .rules-box {
-        background-color: rgba(15, 23, 42, 0.6);
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
-        padding: 14px 16px;
-        margin-bottom: 26px;
-        font-size: 0.85rem;
-        line-height: 1.5;
-        color: var(--text-secondary);
-      }
-
-      .rules-box h4 {
-        color: var(--text-primary);
-        font-size: 0.85rem;
-        font-weight: 700;
-        margin-bottom: 6px;
+      /* Команды и игроки */
+      .teams-builder {
         display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .rules-box ul {
-        list-style: none;
-        padding-left: 0;
-      }
-
-      .rules-box li {
-        margin-bottom: 4px;
-        position: relative;
-        padding-left: 14px;
-      }
-
-      .rules-box li::before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: var(--iof-orange);
-      }
-
-      .btn-primary {
-        width: 100%;
-        padding: 16px 24px;
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #ffffff;
-        background-color: var(--iof-orange);
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
         gap: 10px;
       }
 
-      .btn-primary:hover {
-        background-color: var(--iof-orange-hover);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(249, 115, 22, 0.5);
+      .team-config-card {
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        padding: 12px;
+        border-left: 4px solid var(--team-1);
       }
 
-      .btn-primary:active {
-        transform: translateY(0);
+      .team-header-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
       }
 
-      /* --- ЭКРАН 2: ИГРА --- */
+      .team-name-input {
+        flex: 1;
+        background-color: var(--surface-input);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-weight: 800;
+        padding: 8px 12px;
+        outline: none;
+      }
+
+      .team-name-input:focus {
+        border-color: var(--iof-orange);
+      }
+
+      .players-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .player-input {
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 0.82rem;
+        padding: 6px 10px;
+        outline: none;
+      }
+
+      .player-input:focus {
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+
+      /* --- ЭКРАН 2: ПЕРЕДАЧА ХОДА / ГОТОВЫ --- */
+      .ready-card {
+        background-color: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        padding: 28px 20px;
+        text-align: center;
+        margin: auto 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.4);
+      }
+
+      .ready-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .ready-team-title {
+        font-size: 2rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .ready-roles-box {
+        background-color: var(--surface-input);
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-align: left;
+      }
+
+      .role-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.95rem;
+      }
+
+      .role-title {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+      }
+
+      .role-name {
+        font-weight: 800;
+        color: #ffffff;
+      }
+
+      .leaderboard-mini {
+        background-color: rgba(15, 23, 42, 0.4);
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .mini-lead-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .mini-lead-row:last-child {
+        border-bottom: none;
+      }
+
+      /* --- ЭКРАН 3: ИГРОВОЙ ЭКРАН (ОЧИЩЕННЫЙ, ВЫСОКАЯ КАРТОЧКА) --- */
       .game-layout {
         display: flex;
         flex-direction: column;
         height: 100%;
-        justify-content: space-between;
-        gap: 16px;
+        flex: 1;
+        gap: 12px;
       }
 
-      /* Верхний HUD игры */
       .game-hud {
         display: flex;
         align-items: center;
@@ -336,63 +447,78 @@
         background-color: var(--surface-card);
         border: 1px solid var(--border-subtle);
         border-radius: 14px;
-        padding: 12px 18px;
-        gap: 12px;
+        padding: 8px 14px;
+        gap: 10px;
       }
 
-      .hud-score-cluster {
+      .hud-left-group {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 10px;
       }
 
-      .hud-score-item {
+      .btn-quit-hud {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: var(--text-secondary);
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .btn-quit-hud:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border-color: rgba(239, 68, 68, 0.3);
+      }
+
+      .hud-team-indicator {
+        font-size: 0.85rem;
+        font-weight: 800;
         display: flex;
         align-items: center;
         gap: 6px;
       }
 
-      .hud-score-badge {
-        width: 24px;
-        height: 24px;
-        border-radius: 6px;
+      .hud-score-cluster {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        font-weight: bold;
+        gap: 10px;
+      }
+
+      .hud-score-badge {
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
 
       .hud-score-badge.guessed {
-        background-color: rgba(22, 163, 74, 0.2);
+        background-color: rgba(34, 197, 94, 0.15);
         color: #4ade80;
-        border: 1px solid rgba(74, 222, 128, 0.3);
+        border: 1px solid rgba(74, 222, 128, 0.25);
       }
 
       .hud-score-badge.skipped {
-        background-color: rgba(239, 68, 68, 0.2);
+        background-color: rgba(239, 68, 68, 0.15);
         color: #f87171;
-        border: 1px solid rgba(248, 113, 113, 0.3);
+        border: 1px solid rgba(248, 113, 113, 0.25);
       }
 
-      .hud-score-val {
-        font-size: 1.15rem;
-        font-weight: 800;
-        font-variant-numeric: tabular-nums;
-      }
-
-      /* Круговой таймер */
-      .hud-timer-wrap {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-variant-numeric: tabular-nums;
-      }
-
+      /* Таймер в HUD */
       .timer-circle {
         position: relative;
-        width: 52px;
-        height: 52px;
+        width: 44px;
+        height: 44px;
       }
 
       .timer-svg {
@@ -408,7 +534,7 @@
       }
 
       .timer-bar-circle {
-        stroke: var(--forest-green);
+        stroke: var(--forest-green-light);
         stroke-width: 4;
         stroke-linecap: round;
         fill: none;
@@ -431,34 +557,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.15rem;
+        font-size: 1.05rem;
         font-weight: 800;
+        font-variant-numeric: tabular-nums;
       }
 
-      .timer-circle.danger .timer-number {
-        color: var(--skip-red);
-        animation: pulseWarning 1s infinite;
-      }
-
-      @keyframes pulseWarning {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-      }
-
-      /* Карточка со словом */
+      /* --- ВЫТЯНУТАЯ ВЫСОКАЯ КАРТОЧКА СЛОВА (ГЛАВНАЯ ЗОНА СВАЙПА) --- */
       .word-card {
         background-color: var(--surface-card);
         border: 2px solid var(--border-subtle);
-        border-radius: 20px;
-        padding: 28px 20px;
+        border-radius: 24px;
+        padding: 30px 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
         text-align: center;
-        min-height: 290px;
+        flex: 1;
+        min-height: 400px;
         position: relative;
-        box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.45);
         transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         touch-action: none;
         user-select: none;
@@ -470,12 +588,12 @@
       }
 
       .word-card.card-exit-guess-up {
-        transform: translate3d(0, -180px, 0) scale(0.9);
+        transform: translate3d(0, -260px, 0) scale(0.85);
         opacity: 0;
       }
 
       .word-card.card-exit-skip-down {
-        transform: translate3d(0, 180px, 0) scale(0.9);
+        transform: translate3d(0, 260px, 0) scale(0.85);
         opacity: 0;
       }
 
@@ -484,15 +602,15 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        font-size: 0.76rem;
-        font-weight: 700;
+        font-size: 0.82rem;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         opacity: 0.55;
-        transition: opacity 0.2s ease, transform 0.2s ease;
-        padding: 4px 10px;
-        border-radius: 6px;
-        background: rgba(15, 23, 42, 0.35);
+        transition: all 0.2s ease;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.4);
       }
 
       .swipe-cue-up {
@@ -505,371 +623,293 @@
 
       .word-card.dragging-up .swipe-cue-up {
         opacity: 1;
-        transform: translateY(-3px);
-        background: rgba(34, 197, 94, 0.15);
+        transform: translateY(-4px) scale(1.05);
+        background: rgba(34, 197, 94, 0.2);
       }
 
       .word-card.dragging-down .swipe-cue-down {
         opacity: 1;
-        transform: translateY(3px);
-        background: rgba(239, 68, 68, 0.15);
+        transform: translateY(4px) scale(1.05);
+        background: rgba(239, 68, 68, 0.2);
       }
 
-      .card-header-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-
-      .category-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: var(--iof-orange);
-      }
-
-      .category-name {
-        color: var(--iof-orange);
-      }
-
-      .card-deck-indicator {
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-
-      .card-word {
-        font-size: 2.6rem;
-        font-weight: 900;
-        line-height: 1.15;
-        color: #ffffff;
-        margin: auto 0;
-        letter-spacing: -0.02em;
-        text-wrap: balance;
-        max-width: 100%;
-        word-break: break-word;
-        padding: 16px 0;
-      }
-
-      /* Нижняя панель действий (Кнопки игры) */
-      .game-actions-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-        margin-top: 8px;
-      }
-
-      .btn-game {
-        border: none;
-        border-radius: 16px;
-        padding: 22px 16px;
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #ffffff;
-        cursor: pointer;
+      .card-center-zone {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 4px;
-        transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
-        touch-action: manipulation;
+        flex: 1;
+        width: 100%;
+        padding: 10px 0;
       }
 
-      .btn-game .btn-subtext {
-        font-size: 0.75rem;
-        font-weight: 500;
-        opacity: 0.85;
+      .card-word {
+        font-size: 2.7rem;
+        font-weight: 900;
+        line-height: 1.15;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+        max-width: 100%;
+        word-break: break-word;
       }
 
-      .btn-skip {
-        background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
-        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
-      }
-
-      .btn-skip:hover {
-        filter: brightness(1.08);
-        transform: translateY(-2px);
-      }
-
-      .btn-skip:active {
-        transform: translateY(1px);
-      }
-
-      .btn-guess {
-        background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
-      }
-
-      .btn-guess:hover {
-        filter: brightness(1.08);
-        transform: translateY(-2px);
-      }
-
-      .btn-guess:active {
-        transform: translateY(1px);
-      }
-
-      .shortcut-hint {
+      /* Нижняя лаконичная полоса подсказок */
+      .swipe-helper-bar {
         text-align: center;
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        margin-top: 2px;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        padding: 6px 12px;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
       }
 
-      /* --- ЭКРАН 3: РЕЗУЛЬТАТЫ --- */
-      .results-container {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
-
-      .summary-banner {
-        background: linear-gradient(135deg, var(--surface-card) 0%, rgba(30, 41, 59, 0.7) 100%);
+      /* --- ЭКРАН 4: ИТОГИ ХОДА / РАУНДА --- */
+      .results-summary-box {
+        background-color: var(--surface-card);
         border: 1px solid var(--border-subtle);
         border-radius: 18px;
-        padding: 24px;
+        padding: 20px;
         text-align: center;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-      }
-
-      .summary-title {
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-secondary);
-        margin-bottom: 6px;
-      }
-
-      .summary-score {
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: #ffffff;
-        line-height: 1;
-        margin-bottom: 12px;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .summary-score span {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--iof-orange);
-        margin-left: 4px;
-      }
-
-      .summary-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        background-color: var(--bg-main);
-        padding: 10px;
-        border-radius: 12px;
-        border: 1px solid var(--border-subtle);
-        margin-top: 14px;
-      }
-
-      .stat-cell {
         display: flex;
         flex-direction: column;
+        gap: 12px;
       }
 
-      .stat-val {
-        font-size: 1.25rem;
-        font-weight: 800;
+      .round-result-score {
+        font-size: 3.2rem;
+        font-weight: 900;
+        line-height: 1;
+        color: #ffffff;
         font-variant-numeric: tabular-nums;
       }
 
-      .stat-label {
-        font-size: 0.72rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        margin-top: 2px;
+      .round-result-score span {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--iof-orange);
       }
 
-      /* Списки карточек результатов */
       .results-tabs {
         display: flex;
         gap: 6px;
-        background-color: var(--surface-card);
+        background-color: var(--surface-input);
         padding: 4px;
-        border-radius: 12px;
-        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
       }
 
       .tab-btn {
         flex: 1;
-        padding: 10px 12px;
+        padding: 8px 12px;
         border: none;
         border-radius: 8px;
         background: transparent;
         color: var(--text-secondary);
         font-weight: 700;
-        font-size: 0.88rem;
+        font-size: 0.85rem;
         cursor: pointer;
-        transition: all 0.15s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
       }
 
       .tab-btn.active {
-        background-color: var(--surface-elevated);
-        color: var(--text-primary);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
-
-      .tab-badge {
-        font-size: 0.75rem;
-        padding: 2px 6px;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.1);
+        background-color: var(--surface-card);
+        color: #ffffff;
       }
 
       .cards-list-box {
         background-color: var(--surface-card);
         border: 1px solid var(--border-subtle);
         border-radius: 14px;
-        padding: 12px;
-        max-height: 280px;
+        padding: 10px;
+        max-height: 220px;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .result-word-row {
+        background-color: rgba(15, 23, 42, 0.45);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .result-word-text {
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+
+      .result-word-hint {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+
+      /* --- ЭКРАН 5: ПЬЕДЕСТАЛ ПОЧЕТА (ФИНАЛ) --- */
+      .podium-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 10px 0;
+      }
+
+      .podium-title {
+        font-size: 1.8rem;
+        font-weight: 900;
+        text-align: center;
+        letter-spacing: -0.02em;
+      }
+
+      .podium-stage {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 480px;
+        height: 240px;
+        margin: 10px 0;
+      }
+
+      .podium-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100%;
+      }
+
+      .podium-block {
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 900;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .podium-place-1 {
+        height: 170px;
+        background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+      }
+
+      .podium-place-2 {
+        height: 130px;
+        background: linear-gradient(180deg, #94a3b8 0%, #475569 100%);
+      }
+
+      .podium-place-3 {
+        height: 100px;
+        background: linear-gradient(180deg, #d97706 0%, #78350f 100%);
+      }
+
+      .podium-team-badge {
+        text-align: center;
+        margin-bottom: 8px;
+        max-width: 100%;
+      }
+
+      .podium-team-name {
+        font-size: 0.95rem;
+        font-weight: 800;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .podium-team-score {
+        font-size: 1.1rem;
+        font-weight: 900;
+      }
+
+      .podium-rank-num {
+        font-size: 2.2rem;
+        font-weight: 900;
+        line-height: 1;
+        opacity: 0.9;
+      }
+
+      /* Модальное окно подтверждения выхода */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 100;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-card {
+        background-color: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        padding: 24px;
+        max-width: 400px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+      }
+
+      .modal-desc {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .modal-actions {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
 
-      .cards-list-box::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .cards-list-box::-webkit-scrollbar-thumb {
-        background-color: var(--surface-elevated);
-        border-radius: 3px;
-      }
-
-      .result-word-row {
-        background-color: rgba(15, 23, 42, 0.5);
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
-        padding: 10px 14px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-      }
-
-      .result-word-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-
-      .result-word-text {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-
-      .result-word-hint {
-        font-size: 0.82rem;
-        color: var(--text-secondary);
-        line-height: 1.35;
-      }
-
-      .result-word-category {
-        font-size: 0.72rem;
-        color: var(--iof-orange);
-        font-weight: 600;
-        white-space: nowrap;
-        background: rgba(249, 115, 22, 0.1);
-        padding: 3px 8px;
-        border-radius: 6px;
-      }
-
-      .empty-list-notice {
-        text-align: center;
-        padding: 28px 12px;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-      }
-
-      .results-actions {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 12px;
-        margin-top: 4px;
-      }
-
-      .btn-secondary {
-        background-color: var(--surface-card);
-        border: 1px solid var(--border-subtle);
-        color: var(--text-secondary);
-        border-radius: 12px;
-        padding: 16px;
-        font-size: 1rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .btn-secondary:hover {
-        background-color: var(--surface-elevated);
-        color: var(--text-primary);
-      }
-
-      /* Адаптивность для мобильных экранов */
-      @media (max-width: 640px) {
-        main {
-          padding: 12px 14px;
-        }
-
-        .settings-card {
-          padding: 20px 16px;
-        }
-
+      @media (max-width: 600px) {
         .card-word {
-          font-size: 1.85rem;
+          font-size: 2.15rem;
         }
-
         .word-card {
+          min-height: 380px;
           padding: 24px 16px;
-          min-height: 240px;
-        }
-
-        .btn-game {
-          padding: 18px 12px;
-          font-size: 1.15rem;
-        }
-
-        .summary-score {
-          font-size: 2.8rem;
-        }
-
-        .results-actions {
-          grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
   <body>
-    <!-- Верхний бар -->
+    <!-- Верхняя панель -->
     <header>
       <div class="brand">
-        <div class="iof-prism-icon" title="Знак контрольного пункта IOF"></div>
+        <div class="iof-prism-icon" title="КП IOF"></div>
         <div>
           <h1 class="brand-title">Алиас: Ориентирование</h1>
           <div class="brand-badge">Стандарт ISSprOM 2019-2</div>
         </div>
       </div>
       <div class="header-actions">
-        <button id="soundToggleBtn" class="icon-btn" title="Звуковые эффекты (вкл/выкл)" aria-label="Звук">
+        <button id="soundToggleBtn" class="icon-btn" title="Звук (вкл/выкл)" aria-label="Звук">
           <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -885,275 +925,311 @@
     </header>
 
     <main>
-      <!-- ЭКРАН 1: НАСТРОЙКИ -->
+      <!-- ЭКРАН 1: НАСТРОЙКИ (КОМАНДЫ, ИГРОКИ, ВРЕМЯ) -->
       <section id="screenSettings" class="screen active">
         <div class="settings-card">
-          <div class="hero-section">
-            <div class="hero-flag">
-              <div class="iof-prism-icon" style="width: 48px; height: 48px; border-radius: 6px;"></div>
+          <!-- Баннер возобновления прерванного матча (если есть в localStorage) -->
+          <div id="resumeBanner" class="resume-banner" style="display: none;">
+            <span>Найдена сохраненная игра</span>
+            <div style="display: flex; gap: 6px;">
+              <button id="resumeGameBtn" class="resume-btn">Продолжить</button>
+              <button id="discardGameBtn" class="btn-danger-outline" style="padding: 6px 10px; font-size: 0.8rem;">✕</button>
             </div>
-            <h2 class="hero-title">Спортивное ориентирование</h2>
-            <p class="hero-desc">Объясняйте официальные знаки стандарта спринт-кросса ISSprOM 2019-2 своей команде без однокоренных слов!</p>
           </div>
 
-          <div class="setting-group">
+          <!-- Выбор режима игры -->
+          <div>
+            <label class="setting-label">Формат игры</label>
+            <div class="segmented-control">
+              <button type="button" class="segment-btn active" data-mode="teams">Команды (до 4)</button>
+              <button type="button" class="segment-btn" data-mode="solo">Один на один</button>
+            </div>
+          </div>
+
+          <!-- Блок настройки команд (скрывается в режиме соло) -->
+          <div id="teamsConfigBlock">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <label class="setting-label" style="margin-bottom: 0;">Количество команд</label>
+              <div class="segmented-control" style="width: 170px;">
+                <button type="button" class="segment-btn active" data-teams="2">2</button>
+                <button type="button" class="segment-btn" data-teams="3">3</button>
+                <button type="button" class="segment-btn" data-teams="4">4</button>
+              </div>
+            </div>
+
+            <!-- Список команд и игроков -->
+            <div id="teamsBuilder" class="teams-builder">
+              <!-- Генерируется через JS -->
+            </div>
+          </div>
+
+          <!-- Условие победы (в командном режиме) -->
+          <div id="goalConfigBlock">
+            <label class="setting-label">Условие победы</label>
+            <div class="segmented-control">
+              <button type="button" class="segment-btn active" data-goal="rounds" data-val="3">3 круга</button>
+              <button type="button" class="segment-btn" data-goal="rounds" data-val="5">5 кругов</button>
+              <button type="button" class="segment-btn" data-goal="score" data-val="25">До 25 очков</button>
+              <button type="button" class="segment-btn" data-goal="score" data-val="40">До 40 очков</button>
+            </div>
+          </div>
+
+          <!-- Время раунда -->
+          <div>
             <label class="setting-label">Время раунда</label>
             <div class="segmented-control">
-              <button type="button" class="time-btn" data-time="30">
-                30 сек
-                <span>Разминка</span>
-              </button>
-              <button type="button" class="time-btn active" data-time="60">
-                60 сек
-                <span>Стандарт</span>
-              </button>
-              <button type="button" class="time-btn" data-time="90">
-                90 сек
-                <span>Марафон</span>
-              </button>
+              <button type="button" class="segment-btn" data-time="30">30 сек</button>
+              <button type="button" class="segment-btn active" data-time="60">60 сек</button>
+              <button type="button" class="segment-btn" data-time="90">90 сек</button>
             </div>
           </div>
 
-          <div class="rules-box">
-            <h4>Правила раунда</h4>
-            <ul>
-              <li>Объясняйте термин вслух любыми словами и жестами, кроме однокоренных.</li>
-              <li>Команда угадала: <strong>свайп вверх ↑</strong> или кнопка «Угадано» (+1 очко).</li>
-              <li>Не знаете как пояснить: <strong>свайп вниз ↓</strong> или кнопка «Пропуск» (0 очков).</li>
-              <li>В базе 102 знака ISSprOM 2019-2: Рельеф, Скалы, Вода, Лес, Препятствия и Трасса.</li>
-              <li>Управление на ПК: клавиши со стрелками [↑] и [↓].</li>
-            </ul>
-          </div>
-
-          <button id="startGameBtn" class="btn-primary">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            Старт раунда
+          <button id="startSetupBtn" class="btn-primary">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Начать игру
           </button>
         </div>
       </section>
 
-      <!-- ЭКРАН 2: ИГРА -->
+      <!-- ЭКРАН 2: ПЕРЕДАЧА ХОДА / ГОТОВЫ К РАУНДУ -->
+      <section id="screenReady" class="screen">
+        <div class="ready-card">
+          <div class="ready-badge" id="readyRoundBadge">Раунд 1 из 3</div>
+          <div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 4px;">Ход команды:</div>
+            <h2 id="readyTeamName" class="ready-team-title" style="color: var(--team-1);">Азимут</h2>
+          </div>
+
+          <div class="ready-roles-box">
+            <div class="role-row">
+              <span class="role-title">Объясняет:</span>
+              <span id="readyExplainingPlayer" class="role-name">Игрок 1</span>
+            </div>
+            <div class="role-row">
+              <span class="role-title">Отгадывают:</span>
+              <span id="readyGuessingPlayers" class="role-name">Вся команда</span>
+            </div>
+          </div>
+
+          <div id="readyLeaderboardBlock" class="leaderboard-mini">
+            <!-- Мини-турнирная таблица -->
+          </div>
+
+          <button id="readyStartRoundBtn" class="btn-primary">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Поехали! Старт
+          </button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 3: ИГРА (ОЧИЩЕННЫЙ, ВЫСОКАЯ КАРТОЧКА ДЛЯ СВАЙПА) -->
       <section id="screenGame" class="screen">
         <div class="game-layout">
           <!-- Верхний HUD -->
           <div class="game-hud">
-            <div class="hud-score-cluster">
-              <div class="hud-score-item" title="Угадано">
-                <div class="hud-score-badge guessed">✓</div>
-                <div id="gameScoreGuessed" class="hud-score-val" style="color: #4ade80;">0</div>
-              </div>
-              <div class="hud-score-item" title="Пропущено">
-                <div class="hud-score-badge skipped">✕</div>
-                <div id="gameScoreSkipped" class="hud-score-val" style="color: #f87171;">0</div>
+            <div class="hud-left-group">
+              <button id="btnEarlyQuit" class="btn-quit-hud" title="Прервать раунд">✕ Прервать</button>
+              <div id="hudTeamInfo" class="hud-team-indicator">
+                <span id="hudTeamDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--team-1);"></span>
+                <span id="hudTeamName">Азимут</span>
               </div>
             </div>
 
-            <!-- Круговой таймер -->
-            <div class="hud-timer-wrap">
-              <div id="timerCircle" class="timer-circle">
-                <svg class="timer-svg" viewBox="0 0 52 52">
-                  <circle class="timer-bg-circle" cx="26" cy="26" r="22"></circle>
-                  <circle id="timerBarCircle" class="timer-bar-circle" cx="26" cy="26" r="22"></circle>
-                </svg>
-                <div id="timerDisplay" class="timer-number">60</div>
-              </div>
+            <div class="hud-score-cluster">
+              <div class="hud-score-badge guessed">✓ <span id="gameScoreGuessed">0</span></div>
+              <div class="hud-score-badge skipped">✕ <span id="gameScoreSkipped">0</span></div>
+            </div>
+
+            <div class="timer-circle" id="timerCircle">
+              <svg class="timer-svg" viewBox="0 0 44 44">
+                <circle class="timer-bg-circle" cx="22" cy="22" r="18"></circle>
+                <circle id="timerBarCircle" class="timer-bar-circle" cx="22" cy="22" r="18" style="stroke-dasharray: 113.1;"></circle>
+              </svg>
+              <div id="timerDisplay" class="timer-number">60</div>
             </div>
           </div>
 
-          <!-- Карточка термина с поддержкой свайпов вверх и вниз -->
+          <!-- Вытянутая высокая карточка для свайпа -->
           <div id="wordCard" class="word-card">
             <div class="swipe-cue swipe-cue-up">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="19" x2="12" y2="5"></line>
-                <polyline points="5 12 12 5 19 12"></polyline>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>
               </svg>
               <span>Свайп вверх — Угадано</span>
             </div>
 
-            <div class="card-header-meta">
-              <span class="category-dot"></span>
-              <span id="cardCategory" class="category-name">Рельеф</span>
-              <span style="color: var(--border-subtle);">•</span>
-              <span id="cardDeckRemaining" class="card-deck-indicator">1 / 50</span>
+            <div class="card-center-zone">
+              <div id="cardWord" class="card-word">Горизонталь</div>
             </div>
 
-            <div id="cardWord" class="card-word">Горизонталь</div>
-
             <div class="swipe-cue swipe-cue-down">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>
               </svg>
               <span>Свайп вниз — Пропуск</span>
             </div>
           </div>
 
-          <!-- Нижние кнопки действий -->
-          <div>
-            <div class="game-actions-grid">
-              <button id="btnSkip" class="btn-game btn-skip">
-                ✕ Пропуск
-                <span class="btn-subtext">Свайп вниз или [↓]</span>
-              </button>
-              <button id="btnGuess" class="btn-game btn-guess">
-                ✓ Угадано
-                <span class="btn-subtext">Свайп вверх или [↑]</span>
-              </button>
-            </div>
-            <div class="shortcut-hint">Управление: свайп вверх / [↑] — Угадано • свайп вниз / [↓] — Пропуск</div>
+          <!-- Лаконичная полоса подсказок управления -->
+          <div class="swipe-helper-bar">
+            Свайп вверх / [↑] — Угадано &nbsp;•&nbsp; Свайп вниз / [↓] — Пропуск
           </div>
         </div>
       </section>
 
-      <!-- ЭКРАН 3: РЕЗУЛЬТАТЫ -->
-      <section id="screenResults" class="screen">
-        <div class="results-container">
-          <div class="summary-banner">
-            <div class="summary-title">Раунд завершен!</div>
-            <div class="summary-score" id="resultTotalScore">0 <span>очков</span></div>
-            <div class="summary-stats-grid">
-              <div class="stat-cell">
-                <span id="statGuessed" class="stat-val" style="color: #4ade80;">0</span>
-                <span class="stat-label">Угадано</span>
-              </div>
-              <div class="stat-cell">
-                <span id="statSkipped" class="stat-val" style="color: #f87171;">0</span>
-                <span class="stat-label">Пропущено</span>
-              </div>
-              <div class="stat-cell">
-                <span id="statAccuracy" class="stat-val" style="color: var(--iof-orange);">0%</span>
-                <span class="stat-label">Точность</span>
-              </div>
-            </div>
+      <!-- ЭКРАН 4: ИТОГИ ХОДА / РАУНДА -->
+      <section id="screenRoundResults" class="screen">
+        <div style="display: flex; flex-direction: column; gap: 14px; flex: 1;">
+          <div class="results-summary-box">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Время вышло!</div>
+            <h2 id="roundResultTeamTitle" style="font-size: 1.5rem; font-weight: 900;">Команда Азимут</h2>
+            <div class="round-result-score"><span id="roundPlusSign">+</span><span id="roundResultPoints">0</span> <span>очков</span></div>
           </div>
 
-          <!-- Вкладки результатов -->
+          <!-- Вкладки угаданных / пропущенных -->
           <div class="results-tabs">
-            <button id="tabBtnGuessed" class="tab-btn active">
-              Угаданные <span id="badgeGuessedCount" class="tab-badge" style="color: #4ade80;">0</span>
-            </button>
-            <button id="tabBtnSkipped" class="tab-btn">
-              Пропущенные <span id="badgeSkippedCount" class="tab-badge" style="color: #f87171;">0</span>
-            </button>
+            <button id="tabBtnGuessed" class="tab-btn active">Угадано (<span id="countGuessed">0</span>)</button>
+            <button id="tabBtnSkipped" class="tab-btn">Пропущено (<span id="countSkipped">0</span>)</button>
           </div>
 
-          <!-- Список карточек -->
-          <div id="resultsListBox" class="cards-list-box">
-            <!-- Динамически заполняется -->
+          <div id="roundCardsList" class="cards-list-box"></div>
+
+          <!-- Текущий общий счет команд -->
+          <div id="roundLeaderboardBlock" class="leaderboard-mini"></div>
+
+          <button id="nextTurnBtn" class="btn-primary">Следующий ход</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 5: ПЬЕДЕСТАЛ ПОЧЕТА (ФИНАЛ МАТЧА) -->
+      <section id="screenPodium" class="screen">
+        <div class="podium-container">
+          <div style="text-align: center;">
+            <div style="font-size: 0.9rem; color: var(--iof-orange); font-weight: 700; text-transform: uppercase;">Финальный свисток</div>
+            <h2 class="podium-title">Пьедестал почёта! 🏆</h2>
           </div>
 
-          <!-- Кнопки перехода -->
-          <div class="results-actions">
-            <button id="nextRoundBtn" class="btn-primary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Следующий раунд
-            </button>
-            <button id="toSettingsBtn" class="btn-secondary">
-              Настройки
-            </button>
+          <!-- Пьедестал -->
+          <div class="podium-stage" id="podiumStage">
+            <!-- Динамически заполняется (1, 2, 3 места) -->
+          </div>
+
+          <!-- Итоговая таблица всех команд -->
+          <div id="podiumFinalList" style="width: 100%; display: flex; flex-direction: column; gap: 8px;"></div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px;">
+            <button id="rematchBtn" class="btn-primary">Реванш</button>
+            <button id="newGameBtn" class="btn-secondary">В меню</button>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- СКРИПТ: База данных и автономная логика игры -->
+    <!-- МОДАЛЬНОЕ ОКНО ДОСРОЧНОГО ВЫХОДА -->
+    <div id="earlyQuitModal" class="modal-overlay">
+      <div class="modal-card">
+        <h3 class="modal-title">Прервать текущий раунд?</h3>
+        <p class="modal-desc">Вы можете завершить раунд с текущим счетом или отменить его и вернуться в меню настроек.</p>
+        <div class="modal-actions">
+          <button id="btnConfirmFinishRound" class="btn-primary" style="padding: 12px;">Засчитать текущий счет</button>
+          <button id="btnConfirmCancelGame" class="btn-secondary" style="padding: 12px; color: #f87171;">Отменить игру в меню</button>
+          <button id="btnResumeRound" class="btn-secondary" style="padding: 12px;">Продолжить раунд</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- СКРИПТ: База данных и логика автономной игры -->
     <script>
       /* ==========================================================================
-         БАЗА ДАННЫХ: ВСЕ ОФИЦИАЛЬНЫЕ ЗНАКИ ISSprOM 2019-2 («СПРИНТ-КРОСС»)
-         Структура: { id, code, word, category, hint }
-         Содержит полный набор условных знаков международного стандарта ISSprOM 2019-2.
+         БАЗА ДАННЫХ: ВСЕ 102 ОФИЦИАЛЬНЫХ ЗНАКА ISSprOM 2019-2 («СПРИНТ-КРОСС»)
          ========================================================================== */
       const orienteeringWords = [
-        // 4.1 Рельеф (Land forms)
-        { id: 1, code: "101", word: "Горизонталь", category: "Рельеф", hint: "Линия равных высот на карте (стандартное сечение 2 или 2,5 м)" },
-        { id: 2, code: "102", word: "Утолщенная горизонталь", category: "Рельеф", hint: "Каждая пятая горизонталь более толстой линией для быстрого счета высоты" },
-        { id: 3, code: "103", word: "Вспомогательная горизонталь", category: "Рельеф", hint: "Пунктирная горизонталь между основными для мелких форм рельефа" },
-        { id: 4, code: "104", word: "Грунтовый обрыв", category: "Рельеф", hint: "Резкое изменение уровня грунта, карьер или насыпь со штрихами склона" },
-        { id: 5, code: "105", word: "Небольшой грунтовый вал", category: "Рельеф", hint: "Выделяющийся искусственный или естественный узкий грунтовый вал (от 0,5 м)" },
-        { id: 6, code: "107", word: "Овраг, промоина или траншея", category: "Рельеф", hint: "Узкая промоина или траншея одной линией глубиной от 1 м с заостренным концом" },
-        { id: 7, code: "108", word: "Небольшая промоина или канава", category: "Рельеф", hint: "Мелкий эрозионный овраг или канава (пунктир из коричневых точек)" },
-        { id: 8, code: "109", word: "Небольшой холмик, бугорок", category: "Рельеф", hint: "Характерный холмик или скалистая горка (коричневая точка диаметром 3 м)" },
-        { id: 9, code: "110", word: "Небольшой вытянутый холм, бугорок", category: "Рельеф", hint: "Очевидный вытянутый бугорок длиной до 6 м (коричневый эллипс)" },
-        { id: 10, code: "111", word: "Небольшое понижение", category: "Рельеф", hint: "Неглубокое естественное углубление или впадина (коричневый полукруг на север)" },
-        { id: 11, code: "112", word: "Яма или воронка", category: "Рельеф", hint: "Яма с четко выраженными крутыми сторонами (коричневый шеврон V на север)" },
-        { id: 12, code: "113", word: "Неровный грунт", category: "Рельеф", hint: "Область мелких ям или холмов (случайно расположенные коричневые точки)" },
-        { id: 13, code: "115", word: "Характерный элемент рельефа", category: "Рельеф", hint: "Заметная особенность рельефа (коричневый равносторонний треугольник)" },
+        // 4.1 Рельеф
+        { id: 1, code: "101", word: "Горизонталь", category: "Рельеф", hint: "Линия равных высот на карте (сечение 2 или 2,5 м)" },
+        { id: 2, code: "102", word: "Утолщенная горизонталь", category: "Рельеф", hint: "Каждая пятая горизонталь более толстой линией для счета высоты" },
+        { id: 3, code: "103", word: "Вспомогательная горизонталь", category: "Рельеф", hint: "Пунктирная горизонталь между основными для мелких форм" },
+        { id: 4, code: "104", word: "Грунтовый обрыв", category: "Рельеф", hint: "Резкое изменение уровня грунта, карьер или насыпь со штрихами" },
+        { id: 5, code: "105", word: "Небольшой грунтовый вал", category: "Рельеф", hint: "Выделяющийся узкий грунтовый вал от 0,5 м" },
+        { id: 6, code: "107", word: "Овраг, промоина или траншея", category: "Рельеф", hint: "Узкая промоина одной линией глубиной от 1 м с заостренным концом" },
+        { id: 7, code: "108", word: "Небольшая промоина или канава", category: "Рельеф", hint: "Мелкий эрозионный овраг (пунктир из коричневых точек)" },
+        { id: 8, code: "109", word: "Небольшой холмик, бугорок", category: "Рельеф", hint: "Характерный холмик или горка (коричневая точка)" },
+        { id: 9, code: "110", word: "Небольшой вытянутый холм, бугорок", category: "Рельеф", hint: "Вытянутый бугорок длиной до 6 м (коричневый эллипс)" },
+        { id: 10, code: "111", word: "Небольшое понижение", category: "Рельеф", hint: "Неглубокая естественная впадина (полукруг на север)" },
+        { id: 11, code: "112", word: "Яма или воронка", category: "Рельеф", hint: "Яма с четко выраженными крутыми сторонами (шеврон V на север)" },
+        { id: 12, code: "113", word: "Неровный грунт", category: "Рельеф", hint: "Область мелких ям или холмов (случайные коричневые точки)" },
+        { id: 13, code: "115", word: "Характерный элемент рельефа", category: "Рельеф", hint: "Заметная особенность рельефа (равносторонний коричневый треугольник)" },
 
-        // 4.2 Камни и скалы (Rock and boulders)
-        { id: 14, code: "201", word: "Непреодолимый скальный обрыв", category: "Камни и скалы", hint: "Вертикальная скальная стена со штрихами вниз (запрещено преодолевать)" },
-        { id: 15, code: "202", word: "Преодолимый скальный обрыв", category: "Камни и скалы", hint: "Преодолимый скальный уступ или карьер высотой от 0,6 м" },
+        // 4.2 Камни и скалы
+        { id: 14, code: "201", word: "Непреодолимый скальный обрыв", category: "Камни и скалы", hint: "Вертикальная стена со штрихами вниз (запрещено преодолевать!)" },
+        { id: 15, code: "202", word: "Преодолимый скальный обрыв", category: "Камни и скалы", hint: "Преодолимый скальный уступ или карьер от 0,6 м" },
         { id: 16, code: "203", word: "Скалистая яма или пещера", category: "Камни и скалы", hint: "Скалистая яма, пещера или шахта (черный шеврон V на север)" },
-        { id: 17, code: "204", word: "Валун, камень", category: "Камни и скалы", hint: "Небольшой отчетливый отдельно лежащий валун (черная точка 2,4 м)" },
-        { id: 18, code: "205", word: "Большой валун", category: "Камни и скалы", hint: "Особо крупный и выделяющийся валун (крупная черная точка 3,6 м)" },
-        { id: 19, code: "206", word: "Гигантский валун или каменный столб", category: "Камни и скалы", hint: "Массивный утес или гигантский валун в плане (черный контур)" },
-        { id: 20, code: "207", word: "Скопление валунов, камней", category: "Камни и скалы", hint: "Тесно сгруппированные валуны выше 0,5 м (черный треугольник)" },
-        { id: 21, code: "208", word: "Каменистое поле", category: "Камни и скалы", hint: "Область россыпи множества камней (группа мелких черных треугольников)" },
-        { id: 22, code: "210", word: "Каменистый грунт", category: "Камни и скалы", hint: "Участок каменистой почвы, снижающий скорость бега (черные точки)" },
-        { id: 23, code: "213", word: "Открытый песчаный грунт", category: "Камни и скалы", hint: "Участок песка или гравия без растительности (желтый фон 50% с черными точками)" },
-        { id: 24, code: "214", word: "Голая скала", category: "Камни и скалы", hint: "Монолитная скала, пригодная для бега, без растительности (серый цвет 30%)" },
+        { id: 17, code: "204", word: "Валун, камень", category: "Камни и скалы", hint: "Отчетливый отдельно лежащий валун (черная точка)" },
+        { id: 18, code: "205", word: "Большой валун", category: "Камни и скалы", hint: "Особо крупный доминирующий валун (крупная черная точка)" },
+        { id: 19, code: "206", word: "Гигантский валун или каменный столб", category: "Камни и скалы", hint: "Массивный утес или гигантский валун в плане" },
+        { id: 20, code: "207", word: "Скопление валунов, камней", category: "Камни и скалы", hint: "Группа тесно расположенных валунов (черный треугольник)" },
+        { id: 21, code: "208", word: "Каменистое поле", category: "Камни и скалы", hint: "Область россыпи множества камней (мелкие треугольники)" },
+        { id: 22, code: "210", word: "Каменистый грунт", category: "Камни и скалы", hint: "Каменистая почва, снижающая скорость бега (черные точки)" },
+        { id: 23, code: "213", word: "Открытый песчаный грунт", category: "Камни и скалы", hint: "Песок или гравий без растительности (желтый с черными точками)" },
+        { id: 24, code: "214", word: "Голая скала", category: "Камни и скалы", hint: "Монолитная скальная поверхность без растительности (серый 30%)" },
 
-        // 4.3 Гидрография и болота (Water and marsh)
-        { id: 25, code: "301", word: "Непроходимый водоем", category: "Гидрография", hint: "Глубокое озеро, река, пруд или бассейн (темно-синий с черным контуром, нельзя пересекать!)" },
-        { id: 26, code: "302", word: "Преодолимый водоем", category: "Гидрография", hint: "Мелководный водоем или брод глубиной менее 0,5 м (светло-синий с синим контуром)" },
+        // 4.3 Гидрография и болота
+        { id: 25, code: "301", word: "Непроходимый водоем", category: "Гидрография", hint: "Глубокое озеро, река, бассейн (темно-синий с черным контуром, нельзя пересекать!)" },
+        { id: 26, code: "302", word: "Преодолимый водоем", category: "Гидрография", hint: "Мелководный водоем или брод до 0,5 м (синий контур)" },
         { id: 27, code: "303", word: "Яма с водой", category: "Гидрография", hint: "Заполненная водой яма или углубление (синий шеврон V на север)" },
-        { id: 28, code: "305", word: "Малый пересекаемый водоток", category: "Гидрография", hint: "Пересекаемый ручей шириной менее 2 метров (сплошная синяя линия)" },
-        { id: 29, code: "306", word: "Пересыхаемый / сезонный водоток", category: "Гидрография", hint: "Мелкий водоток, содержащий воду только временно (синяя штриховая линия)" },
-        { id: 30, code: "307", word: "Непроходимое болото", category: "Гидрография", hint: "Глубокое топкое болото с черным контуром (опасно, запрещено пересекать!)" },
-        { id: 31, code: "308", word: "Болото", category: "Гидрография", hint: "Проходимое болото с отчетливым краем (синие горизонтальные полосы)" },
+        { id: 28, code: "305", word: "Малый пересекаемый водоток", category: "Гидрография", hint: "Ручей шириной менее 2 метров (синяя линия)" },
+        { id: 29, code: "306", word: "Пересыхаемый / сезонный водоток", category: "Гидрография", hint: "Русло, содержащее воду временно (синий пунктир)" },
+        { id: 30, code: "307", word: "Непроходимое болото", category: "Гидрография", hint: "Топкое болото с черным контуром (запрещено пересекать!)" },
+        { id: 31, code: "308", word: "Болото", category: "Гидрография", hint: "Проходимое болото с отчетливым краем (синие полосы)" },
         { id: 32, code: "309", word: "Узкое болото", category: "Гидрография", hint: "Узкая заболоченная полоса или ручеек (ряд синих точек)" },
-        { id: 33, code: "310", word: "Заболоченность", category: "Гидрография", hint: "Нечеткое или сезонное болото, проходимое для бега (пунктирные синие полосы)" },
+        { id: 33, code: "310", word: "Заболоченность", category: "Гидрография", hint: "Нечеткое или сезонное проходимое болото (пунктирные синие полосы)" },
         { id: 34, code: "311", word: "Небольшой фонтан или колодец", category: "Гидрография", hint: "Фонтан или колодец диаметром от 1 м (синий квадрат)" },
-        { id: 35, code: "312", word: "Родник", category: "Гидрография", hint: "Естественный выход грунтовых вод с отчетливым оттоком (синяя дуга по течению)" },
+        { id: 35, code: "312", word: "Родник", category: "Гидрография", hint: "Источник воды с оттоком (синяя дуга по течению)" },
         { id: 36, code: "313", word: "Выделяющийся водный объект", category: "Гидрография", hint: "Приметный гидрографический объект (синяя звездочка на север)" },
 
-        // 4.4 Растительность (Vegetation)
-        { id: 37, code: "401", word: "Открытая местность", category: "Растительность", hint: "Газон, луг, поле или пастбище с отличной скоростью бега (100% желтый)" },
-        { id: 38, code: "402", word: "Открытая местность с отдельными деревьями", category: "Растительность", hint: "Редкий лес, луг или парк с деревьями (желтый с белыми/зелеными точками)" },
+        // 4.4 Растительность
+        { id: 37, code: "401", word: "Открытая местность", category: "Растительность", hint: "Газон, луг, поле или пастбище (100% желтый)" },
+        { id: 38, code: "402", word: "Открытая местность с отдельными деревьями", category: "Растительность", hint: "Редкий лес, луг или парк с деревьями" },
         { id: 39, code: "403", word: "Неудобная для бега открытая местность (неудобь)", category: "Растительность", hint: "Вырубка, вересковая пустошь или высокая трава (50% желтый)" },
-        { id: 40, code: "404", word: "Неудобь с редким лесом", category: "Растительность", hint: "Неровная открытая местность с высокой травой и деревьями (50% желтый с точками)" },
-        { id: 41, code: "405", word: "Лес", category: "Растительность", hint: "Типичный чистый легкопроходимый лес для максимальной скорости бега (белый цвет)" },
-        { id: 42, code: "406", word: "Растительность: медленный бег", category: "Растительность", hint: "Густой лес со снижением скорости бега до 60-80% (зеленый растр 30%)" },
-        { id: 43, code: "407", word: "Растительность: бег затруднен, хорошая видимость", category: "Растительность", hint: "Низкие заросли, вереск со снижением скорости бега (зеленые редкие вертикальные полосы)" },
-        { id: 44, code: "408", word: "Растительность: движение пешком", category: "Растительность", hint: "Густой лес со снижением скорости бега до 20-60% (зеленый растр 60%)" },
-        { id: 45, code: "409", word: "Растительность: движение пешком, хорошая видимость", category: "Растительность", hint: "Заросли со снижением скорости до 20-60% при открытом обзоре (зеленые частые полосы)" },
+        { id: 40, code: "404", word: "Неудобь с редким лесом", category: "Растительность", hint: "Высокая трава с отдельными деревьями (50% желтый с точками)" },
+        { id: 41, code: "405", word: "Лес", category: "Растительность", hint: "Типичный чистый легкопроходимый лес для максимальной скорости (белый цвет)" },
+        { id: 42, code: "406", word: "Растительность: медленный бег", category: "Растительность", hint: "Густой лес со снижением скорости до 60-80% (зеленый растр 30%)" },
+        { id: 43, code: "407", word: "Растительность: бег затруднен, хорошая видимость", category: "Растительность", hint: "Низкие заросли со снижением скорости бега (зеленые вертикальные полосы)" },
+        { id: 44, code: "408", word: "Растительность: движение пешком", category: "Растительность", hint: "Густой лес со снижением скорости до 20-60% (зеленый растр 60%)" },
+        { id: 45, code: "409", word: "Растительность: движение пешком, хорошая видимость", category: "Растительность", hint: "Заросли со снижением скорости до 20-60% при открытом обзоре (частые полосы)" },
         { id: 46, code: "410", word: "Растительность: трудно идти", category: "Растительность", hint: "Очень густые заросли со снижением скорости почти до 0% (сплошной зеленый 100%)" },
         { id: 47, code: "411", word: "Непроходимая растительность", category: "Растительность", hint: "Живая изгородь или плотные заросли (темно-зеленый, запрещено пересекать!)" },
-        { id: 48, code: "412", word: "Обрабатываемая земля", category: "Растительность", hint: "Сельхозугодья, посевы (желтый с черным точечным растром, запрещено пересекать!)" },
-        { id: 49, code: "413", word: "Фруктовый сад", category: "Растительность", hint: "Регулярные посадки плодовых деревьев или кустарников (зеленый крап на желтом фоне)" },
-        { id: 50, code: "414", word: "Виноградник или что-то подобное", category: "Растительность", hint: "Плотные ряды виноградных или ягодных культур (зеленые линии посадок)" },
-        { id: 51, code: "415", word: "Четкая граница культивирования", category: "Растительность", hint: "Черная линия границы обрабатываемых земель, садов или полей" },
-        { id: 52, code: "416", word: "Четкая граница растительности", category: "Растительность", hint: "Опушка леса или четкий край посадок (пунктир из черных точек)" },
-        { id: 53, code: "417", word: "Выделяющееся большое дерево", category: "Растительность", hint: "Крупное одиночное приметное дерево (зеленый кружок с белой маской)" },
+        { id: 48, code: "412", word: "Обрабатываемая земля", category: "Растительность", hint: "Сельхозугодья, посевы (запрещено пересекать!)" },
+        { id: 49, code: "413", word: "Фруктовый сад", category: "Растительность", hint: "Регулярные посадки плодовых деревьев или кустарников" },
+        { id: 50, code: "414", word: "Виноградник или что-то подобное", category: "Растительность", hint: "Плотные ряды виноградных или ягодных культур" },
+        { id: 51, code: "415", word: "Четкая граница культивирования", category: "Растительность", hint: "Черная линия границы обрабатываемых земель или садов" },
+        { id: 52, code: "416", word: "Четкая граница растительности", category: "Растительность", hint: "Опушка леса или край посадок (пунктир из черных точек)" },
+        { id: 53, code: "417", word: "Выделяющееся большое дерево", category: "Растительность", hint: "Крупное одиночное дерево (зеленый кружок с белой маской)" },
         { id: 54, code: "418", word: "Выделяющийся куст или небольшое дерево", category: "Растительность", hint: "Одинокий куст или небольшое дерево (зеленый кружок с белой точкой)" },
         { id: 55, code: "419", word: "Характерный объект растительности", category: "Растительность", hint: "Приметная особенность флоры (зеленый крест на север)" },
 
-        // 4.5 Искусственные объекты (Man-made features)
+        // 4.5 Искусственные объекты
         { id: 56, code: "501", word: "Мощеная площадка", category: "Искусственные объекты", hint: "Твердое покрытие: асфальт, плитка, бетон (коричневый 30% или 50%)" },
         { id: 57, code: "501.1", word: "Ступенька или край мощеной площадки", category: "Искусственные объекты", hint: "Бордюр или край мощеной зоны (тонкая черная линия)" },
-        { id: 58, code: "501.2", word: "Ступенька или край площадки на нижнем уровне", category: "Искусственные объекты", hint: "Край мощеной площадки на нижнем ярусе двухуровневой зоны (черный пунктир)" },
-        { id: 59, code: "501.3", word: "Мощеная площадка с отдельными деревьями", category: "Искусственные объекты", hint: "Площадь, сквер или тротуар с деревьями (коричневый с белыми отверстиями)" },
+        { id: 58, code: "501.2", word: "Ступенька или край площадки на нижнем уровне", category: "Искусственные объекты", hint: "Край площадки на нижнем ярусе двухуровневой зоны (черный пунктир)" },
+        { id: 59, code: "501.3", word: "Мощеная площадка с отдельными деревьями", category: "Искусственные объекты", hint: "Площадь, сквер или тротуар с деревьями" },
         { id: 60, code: "505", word: "Грунтовая пешеходная тропа или дорожка", category: "Искусственные объекты", hint: "Грунтовая дорога или широкая тропа без твердого покрытия" },
-        { id: 61, code: "506", word: "Узкая грунтовая пешеходная тропинка", category: "Искусственные объекты", hint: "Узкая тропинка в парке или лесу (одинарный черный пунктир)" },
-        { id: 62, code: "507", word: "Пропадающая тропа или дорожка", category: "Искусственные объекты", hint: "Слабозаметная или прерывающаяся тропа, путь вывоза леса (двойные черточки)" },
-        { id: 63, code: "508", word: "Просека или прогал", category: "Искусственные объекты", hint: "Линейный разрыв в лесу без четкой дорожки (длинный редкий пунктир)" },
+        { id: 61, code: "506", word: "Узкая грунтовая пешеходная тропинка", category: "Искусственные объекты", hint: "Узкая тропинка в парке или лесу (черный пунктир)" },
+        { id: 62, code: "507", word: "Пропадающая тропа или дорожка", category: "Искусственные объекты", hint: "Слабозаметная тропа или путь вывоза леса (двойные черточки)" },
+        { id: 63, code: "508", word: "Просека или прогал", category: "Искусственные объекты", hint: "Линейный разрыв в лесу без четкой дорожки" },
         { id: 64, code: "509.1", word: "Железная дорога", category: "Искусственные объекты", hint: "Постоянный рельсовый путь (черно-белая полосатая линия)" },
-        { id: 65, code: "509.2", word: "Трамвайный путь", category: "Искусственные объекты", hint: "Рельсовый путь городского трамвая (серая сплошная линия 50%)" },
-        { id: 66, code: "510", word: "Линия электропередачи, канатная дорога или подъемник", category: "Искусственные объекты", hint: "Воздушная линия ЛЭП, канатка или подъемник со штрихами опор" },
+        { id: 65, code: "509.2", word: "Трамвайный путь", category: "Искусственные объекты", hint: "Рельсовый путь городского трамвая (серая линия 50%)" },
+        { id: 66, code: "510", word: "Линия электропередачи, канатная дорога или подъемник", category: "Искусственные объекты", hint: "Линия ЛЭП, канатка или подъемник со штрихами опор" },
         { id: 67, code: "511", word: "Высоковольтная линия электропередачи", category: "Искусственные объекты", hint: "Крупная ЛЭП двойной линией с обозначением опор" },
         { id: 68, code: "512.1", word: "Вход под мост или в туннель", category: "Искусственные объекты", hint: "Проход под мостом или путепроводом (черные треугольники вершинами внутрь)" },
-        { id: 69, code: "512.2", word: "Подземный переход или туннель", category: "Искусственные объекты", hint: "Пешеходный проход под землей или зданием (две параллельные пунктирные линии)" },
+        { id: 69, code: "512.2", word: "Подземный переход или туннель", category: "Искусственные объекты", hint: "Пешеходный проход под землей или зданием (две пунктирные линии)" },
         { id: 70, code: "512.3", word: "Зона, проходимая на двух уровнях", category: "Искусственные объекты", hint: "Верхний ярус эстакады или моста (белые диагональные полосы под 45°)" },
-        { id: 71, code: "513.1", word: "Преодолимая стена", category: "Искусственные объекты", hint: "Каменная, кирпичная или бетонная стена высотой до 1,5 м с точками" },
+        { id: 71, code: "513.1", word: "Преодолимая стена", category: "Искусственные объекты", hint: "Стена из камня, кирпича или бетона высотой до 1,5 м с точками" },
         { id: 72, code: "513.2", word: "Проходимая односторонняя стенка", category: "Искусственные объекты", hint: "Подпорная стенка (точки показывают сторону нижнего уровня)" },
         { id: 73, code: "515", word: "Непреодолимая стенка", category: "Искусственные объекты", hint: "Высокая каменная/бетонная стена (толстая сплошная черная линия, нельзя перелезать!)" },
         { id: 74, code: "516", word: "Преодолимый забор или перила", category: "Искусственные объекты", hint: "Забор или перила со штрихами через интервал (можно перелезть/пройти)" },
         { id: 75, code: "518", word: "Непреодолимый забор или перила", category: "Искусственные объекты", hint: "Высокий забор с двойными штрихами (запрещено преодолевать!)" },
         { id: 76, code: "519", word: "Точка пересечения (проход в ограждении)", category: "Искусственные объекты", hint: "Проход, калитка или лаз в заборе/стене (две черные дужки наружу)" },
-        { id: 77, code: "520", word: "Закрытая территория", category: "Искусственные объекты", hint: "Частная территория, клумба, зона путей (желтый 100% / зеленый 50%, вход запрещен!)" },
+        { id: 77, code: "520", word: "Закрытая территория", category: "Искусственные объекты", hint: "Частная территория, клумба, зона путей (вход запрещен!)" },
         { id: 78, code: "521", word: "Здание", category: "Искусственные объекты", hint: "Капитальное строение с крышей (черный контур, темно-серый фон 50%)" },
         { id: 79, code: "522", word: "Навес", category: "Искусственные объекты", hint: "Крытая конструкция на столбах: арка, остановка, проезд (светло-серый фон 20%)" },
         { id: 80, code: "522.1", word: "Колонна", category: "Искусственные объекты", hint: "Отдельная вертикальная опора или столб навеса/здания (черный квадратик)" },
@@ -1167,10 +1243,10 @@
         { id: 88, code: "531", word: "Выделяющийся искусственный объект", category: "Искусственные объекты", hint: "Особый рукотворный объект (черный косой крест)" },
         { id: 89, code: "532", word: "Лестница", category: "Искусственные объекты", hint: "Уличная лестница или ступени (линия с перекладинами ступеней)" },
 
-        // 4.6 Технические символы (Technical symbols)
+        // 4.6 Технические символы
         { id: 90, code: "601", word: "Линия магнитного меридиана", category: "Технические знаки", hint: "Линии на карте, указывающие направление на магнитный север" },
 
-        // 4.7 Знаки элементов трассы (Course elements)
+        // 4.7 Знаки элементов трассы
         { id: 91, code: "701", word: "Начало ориентирования", category: "Знаки трассы", hint: "Точка старта и выдачи карт (фиолетовый равносторонний треугольник)" },
         { id: 92, code: "702", word: "Пункт выдачи карты", category: "Знаки трассы", hint: "Место выдачи карт на трассе (фиолетовая поперечная черта)" },
         { id: 93, code: "703", word: "Контрольный пункт", category: "Знаки трассы", hint: "Местоположение КП (фиолетовый круг диаметром 24 м на местности)" },
@@ -1186,37 +1262,51 @@
       ];
 
       /* ==========================================================================
-         СОСТОЯНИЕ ИГРЫ (GAME STATE)
+         КОНФИГУРАЦИЯ И СОХРАНЕНИЕ В LOCALSTORAGE
          ========================================================================== */
-      let selectedRoundDuration = 60; // 30, 60 или 90 секунд
+      const STORAGE_KEY_CONFIG = "orienteering_alias_config";
+      const STORAGE_KEY_STATE = "orienteering_alias_active_state";
+
+      const TEAM_COLORS = ["#f97316", "#10b981", "#3b82f6", "#a855f7"];
+      const DEFAULT_TEAM_NAMES = ["Азимут", "Призма", "Компас", "Спринтеры"];
+
+      // Текущие настройки
+      let gameMode = "teams"; // "teams" | "solo"
+      let numTeams = 2;
+      let teams = [
+        { name: "Азимут", color: "#f97316", score: 0, players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"], nextPlayerIdx: 0 },
+        { name: "Призма", color: "#10b981", score: 0, players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"], nextPlayerIdx: 0 }
+      ];
+      let goalType = "rounds"; // "rounds" | "score"
+      let goalValue = 3; // 3 круга или N очков
+      let roundDuration = 60; // 30, 60, 90
+
+      // Состояние активного матча
+      let currentRoundNumber = 1;
+      let currentTeamTurnIndex = 0;
+      let deck = [];
+      let cardIdx = 0;
       let timerInterval = null;
       let timeLeft = 60;
+      let roundGuessed = [];
+      let roundSkipped = [];
+      let activeResultTab = "guessed";
+      let isPaused = false;
       let soundEnabled = true;
 
-      let deck = [];
-      let currentCardIndex = 0;
-      let guessedCards = [];
-      let skippedCards = [];
-      let activeResultTab = "guessed"; // "guessed" | "skipped"
-
-      // Длина окружности SVG круга таймера (2 * pi * 22 ≈ 138.2)
-      const CIRCLE_CIRCUMFERENCE = 138.23;
+      // Длина окружности SVG таймера
+      const TIMER_CIRCUMFERENCE = 113.1;
 
       /* ==========================================================================
-         WEB AUDIO API (Синтезатор звуков без внешних файлов)
+         WEB AUDIO API (Звуки)
          ========================================================================== */
       let audioCtx = null;
-
       function getAudioContext() {
         if (!audioCtx) {
           const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass) {
-            audioCtx = new AudioContextClass();
-          }
+          if (AudioContextClass) audioCtx = new AudioContextClass();
         }
-        if (audioCtx && audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         return audioCtx;
       }
 
@@ -1226,207 +1316,423 @@
           const ctx = getAudioContext();
           if (!ctx) return;
           const now = ctx.currentTime;
-
           if (type === 'guess') {
-            // Приятный мажорный перезвон (успех)
-            const osc1 = ctx.createOscillator();
-            const osc2 = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            osc1.type = 'triangle';
-            osc2.type = 'sine';
-            osc1.frequency.setValueAtTime(523.25, now); // C5
-            osc1.frequency.exponentialRampToValueAtTime(659.25, now + 0.08); // E5
-            osc2.frequency.setValueAtTime(659.25, now + 0.08);
-            osc2.frequency.exponentialRampToValueAtTime(783.99, now + 0.16); // G5
-
-            gain.gain.setValueAtTime(0.18, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(ctx.destination);
-
-            osc1.start(now);
-            osc1.stop(now + 0.2);
-            osc2.start(now + 0.08);
-            osc2.stop(now + 0.28);
-
-            if (navigator.vibrate) navigator.vibrate(35);
-          } else if (type === 'skip') {
-            // Низкий мягкий спадающий тон (пропуск)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(320, now);
-            osc.frequency.exponentialRampToValueAtTime(160, now + 0.18);
-
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
             osc.connect(gain);
             gain.connect(ctx.destination);
-
+            osc.start(now);
+            osc.stop(now + 0.25);
+            if (navigator.vibrate) navigator.vibrate(30);
+          } else if (type === 'skip') {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(150, now + 0.18);
+            gain.gain.setValueAtTime(0.14, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
             osc.start(now);
             osc.stop(now + 0.2);
-
             if (navigator.vibrate) navigator.vibrate(60);
           } else if (type === 'tick') {
-            // Мягкий метрономный щелчок
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(800, now);
-
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-
+            osc.frequency.setValueAtTime(850, now);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
             osc.connect(gain);
             gain.connect(ctx.destination);
-
             osc.start(now);
-            osc.stop(now + 0.05);
+            osc.stop(now + 0.04);
           } else if (type === 'buzzer') {
-            // Спортивный судейский свисток / гонг окончания времени
             const osc1 = ctx.createOscillator();
             const osc2 = ctx.createOscillator();
             const gain = ctx.createGain();
-
             osc1.type = 'sawtooth';
             osc2.type = 'square';
             osc1.frequency.setValueAtTime(440, now);
-            osc2.frequency.setValueAtTime(444, now); // легкий фазовый бой
-
+            osc2.frequency.setValueAtTime(444, now);
             gain.gain.setValueAtTime(0.2, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
             osc1.connect(gain);
             osc2.connect(gain);
             gain.connect(ctx.destination);
-
             osc1.start(now);
             osc2.start(now);
-            osc1.stop(now + 0.6);
-            osc2.stop(now + 0.6);
-
+            osc1.stop(now + 0.55);
+            osc2.stop(now + 0.55);
             if (navigator.vibrate) navigator.vibrate([100, 50, 200]);
           }
-        } catch (e) {
-          // Игнорируем ограничения автовоспроизведения браузера до первого клика
-        }
+        } catch (e) {}
       }
 
       /* ==========================================================================
          DOM ЭЛЕМЕНТЫ
          ========================================================================== */
       const screenSettings = document.getElementById('screenSettings');
+      const screenReady = document.getElementById('screenReady');
       const screenGame = document.getElementById('screenGame');
-      const screenResults = document.getElementById('screenResults');
+      const screenRoundResults = document.getElementById('screenRoundResults');
+      const screenPodium = document.getElementById('screenPodium');
 
-      const timeButtons = document.querySelectorAll('.time-btn');
-      const startGameBtn = document.getElementById('startGameBtn');
-      const nextRoundBtn = document.getElementById('nextRoundBtn');
-      const toSettingsBtn = document.getElementById('toSettingsBtn');
+      const resumeBanner = document.getElementById('resumeBanner');
+      const resumeGameBtn = document.getElementById('resumeGameBtn');
+      const discardGameBtn = document.getElementById('discardGameBtn');
+
+      const teamsConfigBlock = document.getElementById('teamsConfigBlock');
+      const teamsBuilder = document.getElementById('teamsBuilder');
+      const goalConfigBlock = document.getElementById('goalConfigBlock');
+      const startSetupBtn = document.getElementById('startSetupBtn');
+
+      const readyRoundBadge = document.getElementById('readyRoundBadge');
+      const readyTeamName = document.getElementById('readyTeamName');
+      const readyExplainingPlayer = document.getElementById('readyExplainingPlayer');
+      const readyGuessingPlayers = document.getElementById('readyGuessingPlayers');
+      const readyLeaderboardBlock = document.getElementById('readyLeaderboardBlock');
+      const readyStartRoundBtn = document.getElementById('readyStartRoundBtn');
+
+      const btnEarlyQuit = document.getElementById('btnEarlyQuit');
+      const hudTeamDot = document.getElementById('hudTeamDot');
+      const hudTeamName = document.getElementById('hudTeamName');
+      const gameScoreGuessed = document.getElementById('gameScoreGuessed');
+      const gameScoreSkipped = document.getElementById('gameScoreSkipped');
+      const timerCircle = document.getElementById('timerCircle');
+      const timerBarCircle = document.getElementById('timerBarCircle');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const wordCard = document.getElementById('wordCard');
+      const cardWord = document.getElementById('cardWord');
+
+      const earlyQuitModal = document.getElementById('earlyQuitModal');
+      const btnConfirmFinishRound = document.getElementById('btnConfirmFinishRound');
+      const btnConfirmCancelGame = document.getElementById('btnConfirmCancelGame');
+      const btnResumeRound = document.getElementById('btnResumeRound');
+
+      const roundResultTeamTitle = document.getElementById('roundResultTeamTitle');
+      const roundPlusSign = document.getElementById('roundPlusSign');
+      const roundResultPoints = document.getElementById('roundResultPoints');
+      const tabBtnGuessed = document.getElementById('tabBtnGuessed');
+      const tabBtnSkipped = document.getElementById('tabBtnSkipped');
+      const countGuessed = document.getElementById('countGuessed');
+      const countSkipped = document.getElementById('countSkipped');
+      const roundCardsList = document.getElementById('roundCardsList');
+      const roundLeaderboardBlock = document.getElementById('roundLeaderboardBlock');
+      const nextTurnBtn = document.getElementById('nextTurnBtn');
+
+      const podiumStage = document.getElementById('podiumStage');
+      const podiumFinalList = document.getElementById('podiumFinalList');
+      const rematchBtn = document.getElementById('rematchBtn');
+      const newGameBtn = document.getElementById('newGameBtn');
+
       const soundToggleBtn = document.getElementById('soundToggleBtn');
       const soundIconOn = document.getElementById('soundIconOn');
       const soundIconOff = document.getElementById('soundIconOff');
 
-      const gameScoreGuessed = document.getElementById('gameScoreGuessed');
-      const gameScoreSkipped = document.getElementById('gameScoreSkipped');
-      const timerDisplay = document.getElementById('timerDisplay');
-      const timerCircle = document.getElementById('timerCircle');
-      const timerBarCircle = document.getElementById('timerBarCircle');
-
-      const wordCard = document.getElementById('wordCard');
-      const cardCategory = document.getElementById('cardCategory');
-      const cardDeckRemaining = document.getElementById('cardDeckRemaining');
-      const cardWord = document.getElementById('cardWord');
-
-      const btnGuess = document.getElementById('btnGuess');
-      const btnSkip = document.getElementById('btnSkip');
-
-      const resultTotalScore = document.getElementById('resultTotalScore');
-      const statGuessed = document.getElementById('statGuessed');
-      const statSkipped = document.getElementById('statSkipped');
-      const statAccuracy = document.getElementById('statAccuracy');
-
-      const tabBtnGuessed = document.getElementById('tabBtnGuessed');
-      const tabBtnSkipped = document.getElementById('tabBtnSkipped');
-      const badgeGuessedCount = document.getElementById('badgeGuessedCount');
-      const badgeSkippedCount = document.getElementById('badgeSkippedCount');
-      const resultsListBox = document.getElementById('resultsListBox');
+      /* ==========================================================================
+         УПРАВЛЕНИЕ ЭКРАНАМИ
+         ========================================================================== */
+      function showScreen(screenEl) {
+        [screenSettings, screenReady, screenGame, screenRoundResults, screenPodium].forEach(s => s.classList.remove('active'));
+        screenEl.classList.add('active');
+        window.scrollTo(0, 0);
+      }
 
       /* ==========================================================================
-         НАВИГАЦИЯ ПО ЭКРАНАМ
+         ИНИЦИАЛИЗАЦИЯ И РЕНДЕР НАСТРОЕК
          ========================================================================== */
-      function showScreen(screenId) {
-        [screenSettings, screenGame, screenResults].forEach(screen => {
-          screen.classList.remove('active');
+      function renderTeamsBuilder() {
+        teamsBuilder.innerHTML = "";
+        for (let i = 0; i < numTeams; i++) {
+          if (!teams[i]) {
+            teams[i] = {
+              name: DEFAULT_TEAM_NAMES[i] || `Команда ${i + 1}`,
+              color: TEAM_COLORS[i % TEAM_COLORS.length],
+              score: 0,
+              players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"],
+              nextPlayerIdx: 0
+            };
+          }
+          const t = teams[i];
+          const card = document.createElement('div');
+          card.className = 'team-config-card';
+          card.style.borderLeftColor = t.color;
+          card.innerHTML = `
+            <div class="team-header-row">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: ${t.color};"></span>
+              <input type="text" class="team-name-input" data-team-idx="${i}" value="${escapeHtml(t.name)}" placeholder="Название команды ${i + 1}" />
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">Игроки команды (до 4 чел):</div>
+            <div class="players-grid">
+              ${t.players.map((p, pIdx) => `
+                <input type="text" class="player-input" data-team-idx="${i}" data-player-idx="${pIdx}" value="${escapeHtml(p)}" placeholder="Игрок ${pIdx + 1}" />
+              `).join('')}
+            </div>
+          `;
+          teamsBuilder.appendChild(card);
+        }
+
+        // Слушатели ввода имен команд и игроков
+        document.querySelectorAll('.team-name-input').forEach(input => {
+          input.addEventListener('input', (e) => {
+            const idx = parseInt(e.target.dataset.teamIdx, 10);
+            teams[idx].name = e.target.value.trim() || `Команда ${idx + 1}`;
+            saveConfig();
+          });
         });
-        if (screenId === 'settings') screenSettings.classList.add('active');
-        if (screenId === 'game') screenGame.classList.add('active');
-        if (screenId === 'results') screenResults.classList.add('active');
+
+        document.querySelectorAll('.player-input').forEach(input => {
+          input.addEventListener('input', (e) => {
+            const tIdx = parseInt(e.target.dataset.teamIdx, 10);
+            const pIdx = parseInt(e.target.dataset.playerIdx, 10);
+            teams[tIdx].players[pIdx] = e.target.value.trim() || `Игрок ${pIdx + 1}`;
+            saveConfig();
+          });
+        });
+      }
+
+      function setupSettingsEvents() {
+        // Режим: Команды vs Соло
+        document.querySelectorAll('[data-mode]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            gameMode = btn.dataset.mode;
+            teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+            goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+            saveConfig();
+          });
+        });
+
+        // Число команд: 2, 3, 4
+        document.querySelectorAll('[data-teams]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-teams]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            numTeams = parseInt(btn.dataset.teams, 10);
+            renderTeamsBuilder();
+            saveConfig();
+          });
+        });
+
+        // Условие победы (Раунды vs Очки)
+        document.querySelectorAll('[data-goal]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-goal]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            goalType = btn.dataset.goal;
+            goalValue = parseInt(btn.dataset.val, 10);
+            saveConfig();
+          });
+        });
+
+        // Время раунда (30, 60, 90)
+        document.querySelectorAll('[data-time]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            roundDuration = parseInt(btn.dataset.time, 10);
+            saveConfig();
+          });
+        });
+
+        // Старт игры из настроек
+        startSetupBtn.addEventListener('click', () => {
+          startNewMatch();
+        });
+
+        // Возобновление сохраненной игры
+        resumeGameBtn.addEventListener('click', () => {
+          resumeMatchFromStorage();
+        });
+
+        discardGameBtn.addEventListener('click', () => {
+          localStorage.removeItem(STORAGE_KEY_STATE);
+          resumeBanner.style.display = 'none';
+        });
+      }
+
+      function saveConfig() {
+        try {
+          const config = { gameMode, numTeams, teams, goalType, goalValue, roundDuration };
+          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
+        } catch (e) {}
+      }
+
+      function loadConfig() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY_CONFIG);
+          if (saved) {
+            const c = JSON.parse(saved);
+            if (c.gameMode) gameMode = c.gameMode;
+            if (c.numTeams) numTeams = c.numTeams;
+            if (c.teams && Array.isArray(c.teams)) teams = c.teams;
+            if (c.goalType) goalType = c.goalType;
+            if (c.goalValue) goalValue = c.goalValue;
+            if (c.roundDuration) roundDuration = c.roundDuration;
+          }
+        } catch (e) {}
+
+        // Синхронизация UI кнопок
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === gameMode));
+        teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+        goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+
+        document.querySelectorAll('[data-teams]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.teams, 10) === numTeams));
+        document.querySelectorAll('[data-goal]').forEach(b => b.classList.toggle('active', b.dataset.goal === goalType && parseInt(b.dataset.val, 10) === goalValue));
+        document.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.time, 10) === roundDuration));
+
+        renderTeamsBuilder();
+
+        // Проверка сохраненной активной игры
+        checkActiveGameSaved();
+      }
+
+      function checkActiveGameSaved() {
+        try {
+          const activeState = localStorage.getItem(STORAGE_KEY_STATE);
+          if (activeState) {
+            resumeBanner.style.display = 'flex';
+          } else {
+            resumeBanner.style.display = 'none';
+          }
+        } catch (e) {}
+      }
+
+      function saveActiveMatchState() {
+        try {
+          const state = {
+            gameMode, numTeams, teams, goalType, goalValue, roundDuration,
+            currentRoundNumber, currentTeamTurnIndex,
+            deck, cardIdx
+          };
+          localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function resumeMatchFromStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_STATE);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          gameMode = s.gameMode;
+          numTeams = s.numTeams;
+          teams = s.teams;
+          goalType = s.goalType;
+          goalValue = s.goalValue;
+          roundDuration = s.roundDuration;
+          currentRoundNumber = s.currentRoundNumber || 1;
+          currentTeamTurnIndex = s.currentTeamTurnIndex || 0;
+          deck = s.deck && s.deck.length ? s.deck : shuffleArray(orienteeringWords);
+          cardIdx = s.cardIdx || 0;
+
+          prepareTurnHandover();
+        } catch (e) {
+          startNewMatch();
+        }
       }
 
       /* ==========================================================================
-         АЛГОРИТМ ПЕРЕМЕШИВАНИЯ (Fisher-Yates Shuffle)
+         СТАРТ И ЛОГИКА МАТЧА
          ========================================================================== */
-      function shuffleArray(arr) {
-        const copy = [...arr];
-        for (let i = copy.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy;
-      }
-
-      /* ==========================================================================
-         ЛОГИКА РАУНДА И КАРТОЧЕК
-         ========================================================================== */
-      function startNewRound() {
-        // Очистка предыдущего таймера
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-
-        // Подготовка колоды
+      function startNewMatch() {
+        // Сброс очков
+        teams.forEach(t => {
+          t.score = 0;
+          t.nextPlayerIdx = 0;
+        });
+        currentRoundNumber = 1;
+        currentTeamTurnIndex = 0;
         deck = shuffleArray(orienteeringWords);
-        currentCardIndex = 0;
-        guessedCards = [];
-        skippedCards = [];
+        cardIdx = 0;
 
-        // Обновление HUD
+        saveActiveMatchState();
+
+        if (gameMode === 'solo') {
+          // В соло режиме сразу запускаем раунд
+          startActiveRound();
+        } else {
+          // В командном режиме открываем экран передачи хода
+          prepareTurnHandover();
+        }
+      }
+
+      function prepareTurnHandover() {
+        const team = teams[currentTeamTurnIndex];
+        const explainingPlayer = team.players[team.nextPlayerIdx % team.players.length] || `Игрок ${team.nextPlayerIdx + 1}`;
+        const guessingPlayers = team.players.filter((_, idx) => idx !== (team.nextPlayerIdx % team.players.length)).join(', ') || 'Вся команда';
+
+        if (goalType === 'rounds') {
+          readyRoundBadge.textContent = `Круг ${currentRoundNumber} из ${goalValue}`;
+        } else {
+          readyRoundBadge.textContent = `Круг ${currentRoundNumber} • Игра до ${goalValue} очков`;
+        }
+
+        readyTeamName.textContent = team.name;
+        readyTeamName.style.color = team.color;
+        readyExplainingPlayer.textContent = explainingPlayer;
+        readyGuessingPlayers.textContent = guessingPlayers;
+
+        // Рендер мини-лидерборда
+        readyLeaderboardBlock.innerHTML = `
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Счет в матче:</div>
+          ${teams.slice(0, numTeams).map((t, idx) => `
+            <div class="mini-lead-row">
+              <span style="font-weight: 700; color: ${t.color};">${idx + 1}. ${escapeHtml(t.name)}</span>
+              <span style="font-weight: 800; font-variant-numeric: tabular-nums;">${t.score} очк.</span>
+            </div>
+          `).join('')}
+        `;
+
+        showScreen(screenReady);
+      }
+
+      readyStartRoundBtn.addEventListener('click', () => {
+        startActiveRound();
+      });
+
+      /* ==========================================================================
+         АКТИВНЫЙ ИГРОВОЙ РАУНД
+         ========================================================================== */
+      function startActiveRound() {
+        if (timerInterval) clearInterval(timerInterval);
+
+        roundGuessed = [];
+        roundSkipped = [];
+        timeLeft = roundDuration;
+        isPaused = false;
+
+        const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : { name: "Разминка", color: "var(--iof-orange)" };
+        hudTeamDot.style.background = team.color;
+        hudTeamName.textContent = team.name;
+
         gameScoreGuessed.textContent = "0";
         gameScoreSkipped.textContent = "0";
-        timeLeft = selectedRoundDuration;
         updateTimerDisplay();
 
-        // Показ первой карточки
         renderCurrentCard();
+        showScreen(screenGame);
 
-        // Переход на экран игры
-        showScreen('game');
-
-        // Запуск таймера
         startTimer();
       }
 
       function renderCurrentCard() {
-        // Если колода закончилась, добавляем перемешанный остаток
-        if (currentCardIndex >= deck.length) {
+        if (cardIdx >= deck.length) {
           deck = shuffleArray(orienteeringWords);
-          currentCardIndex = 0;
+          cardIdx = 0;
         }
 
-        const card = deck[currentCardIndex];
-        cardCategory.textContent = card.code ? `${card.category} · Знак ${card.code}` : card.category;
+        const card = deck[cardIdx];
         cardWord.textContent = card.word;
-        cardDeckRemaining.textContent = `${currentCardIndex + 1} / ${deck.length}`;
 
-        // Сброс анимаций и позиционирования карточки
+        // Сброс классов и стилей карточки
         wordCard.style.transition = 'none';
         wordCard.style.transform = '';
         wordCard.style.opacity = '';
@@ -1436,28 +1742,28 @@
       }
 
       function handleGuess() {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0) return;
+        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
         playSound('guess');
 
-        const card = deck[currentCardIndex];
-        guessedCards.push(card);
-        gameScoreGuessed.textContent = guessedCards.length;
+        const card = deck[cardIdx];
+        roundGuessed.push(card);
+        gameScoreGuessed.textContent = roundGuessed.length;
 
-        animateCardTransition('guess');
+        animateCard('guess');
       }
 
       function handleSkip() {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0) return;
+        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
         playSound('skip');
 
-        const card = deck[currentCardIndex];
-        skippedCards.push(card);
-        gameScoreSkipped.textContent = skippedCards.length;
+        const card = deck[cardIdx];
+        roundSkipped.push(card);
+        gameScoreSkipped.textContent = roundSkipped.length;
 
-        animateCardTransition('skip');
+        animateCard('skip');
       }
 
-      function animateCardTransition(action) {
+      function animateCard(action) {
         wordCard.style.transition = 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease';
         if (action === 'guess') {
           wordCard.classList.add('card-exit-guess-up');
@@ -1466,20 +1772,21 @@
         }
 
         setTimeout(() => {
-          currentCardIndex++;
+          cardIdx++;
           renderCurrentCard();
         }, 160);
       }
 
       /* ==========================================================================
-         ТАЙМЕР ОБРАТНОГО ОТСЧЕТА
+         ТАЙМЕР
          ========================================================================== */
       function startTimer() {
         timerInterval = setInterval(() => {
+          if (isPaused) return;
+
           timeLeft--;
           updateTimerDisplay();
 
-          // Звуковое предупреждение в последние 5 секунд
           if (timeLeft <= 5 && timeLeft > 0) {
             playSound('tick');
           }
@@ -1487,20 +1794,17 @@
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
-            finishRound();
+            finishCurrentTurn();
           }
         }, 1000);
       }
 
       function updateTimerDisplay() {
         timerDisplay.textContent = Math.max(0, timeLeft);
+        const progress = Math.max(0, timeLeft) / roundDuration;
+        const offset = TIMER_CIRCUMFERENCE * (1 - progress);
+        timerBarCircle.style.strokeDashoffset = offset;
 
-        // Расчет прогресса для SVG окружности
-        const progress = Math.max(0, timeLeft) / selectedRoundDuration;
-        const dashOffset = CIRCLE_CIRCUMFERENCE * (1 - progress);
-        timerBarCircle.style.strokeDashoffset = dashOffset;
-
-        // Стилизация фаз времени
         timerCircle.classList.remove('warning', 'danger');
         if (timeLeft <= 5) {
           timerCircle.classList.add('danger');
@@ -1509,55 +1813,133 @@
         }
       }
 
-      function finishRound() {
-        playSound('buzzer');
+      /* ==========================================================================
+         ДОСРОЧНЫЙ ВЫХОД ИЗ РАУНДА (МОДАЛЬНОЕ ОКНО)
+         ========================================================================== */
+      btnEarlyQuit.addEventListener('click', () => {
+        isPaused = true;
+        earlyQuitModal.classList.add('active');
+      });
 
-        // Расчет итогов
-        const totalGuessed = guessedCards.length;
-        const totalSkipped = skippedCards.length;
-        const totalSeen = totalGuessed + totalSkipped;
-        const accuracy = totalSeen > 0 ? Math.round((totalGuessed / totalSeen) * 100) : 0;
+      btnResumeRound.addEventListener('click', () => {
+        isPaused = false;
+        earlyQuitModal.classList.remove('active');
+      });
 
-        resultTotalScore.innerHTML = `${totalGuessed} <span>${getPluralNoun(totalGuessed, 'очко', 'очка', 'очков')}</span>`;
-        statGuessed.textContent = totalGuessed;
-        statSkipped.textContent = totalSkipped;
-        statAccuracy.textContent = `${accuracy}%`;
+      btnConfirmFinishRound.addEventListener('click', () => {
+        earlyQuitModal.classList.remove('active');
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        finishCurrentTurn();
+      });
 
-        badgeGuessedCount.textContent = totalGuessed;
-        badgeSkippedCount.textContent = totalSkipped;
-
-        // По умолчанию открываем список угаданных, либо пропущенных, если угадано 0
-        activeResultTab = totalGuessed > 0 ? 'guessed' : 'skipped';
-        renderResultsList();
-
-        showScreen('results');
-      }
-
-      function getPluralNoun(number, one, two, five) {
-        let n = Math.abs(number);
-        n %= 100;
-        if (n >= 5 && n <= 20) return five;
-        n %= 10;
-        if (n === 1) return one;
-        if (n >= 2 && n <= 4) return two;
-        return five;
-      }
+      btnConfirmCancelGame.addEventListener('click', () => {
+        earlyQuitModal.classList.remove('active');
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        localStorage.removeItem(STORAGE_KEY_STATE);
+        checkActiveGameSaved();
+        showScreen(screenSettings);
+      });
 
       /* ==========================================================================
-         РЕНДЕР СПИСКА КАРТОЧЕК НА ЭКРАНЕ РЕЗУЛЬТАТОВ
+         ЗАВЕРШЕНИЕ ХОДА И ПОДВЕДЕНИЕ ИТОГОВ
          ========================================================================== */
-      function renderResultsList() {
+      function finishCurrentTurn() {
+        playSound('buzzer');
+
+        const pointsGained = roundGuessed.length;
+        const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : teams[0];
+        team.score += pointsGained;
+        team.nextPlayerIdx = (team.nextPlayerIdx + 1) % team.players.length;
+
+        // Отображение итогов хода
+        roundResultTeamTitle.textContent = team.name;
+        roundResultTeamTitle.style.color = team.color;
+        roundResultPoints.textContent = pointsGained;
+        countGuessed.textContent = roundGuessed.length;
+        countSkipped.textContent = roundSkipped.length;
+
+        activeResultTab = roundGuessed.length > 0 ? 'guessed' : 'skipped';
+        renderTurnCardsList();
+
+        // Проверка завершения матча
+        const matchEnded = checkMatchEndCondition();
+
+        if (matchEnded) {
+          nextTurnBtn.textContent = "Перейти к награждению 🏆";
+        } else {
+          // Определяем следующую команду
+          const nextTeamIdx = (currentTeamTurnIndex + 1) % numTeams;
+          const nextTeam = teams[nextTeamIdx];
+          nextTurnBtn.textContent = `Следующий ход: ${nextTeam.name}`;
+        }
+
+        // Рендер лидерборда на экране итогов
+        roundLeaderboardBlock.innerHTML = `
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Турнирная таблица:</div>
+          ${teams.slice(0, numTeams).map((t, idx) => `
+            <div class="mini-lead-row">
+              <span style="font-weight: 700; color: ${t.color};">${idx + 1}. ${escapeHtml(t.name)}</span>
+              <span style="font-weight: 800; font-variant-numeric: tabular-nums;">${t.score} очк.</span>
+            </div>
+          `).join('')}
+        `;
+
+        saveActiveMatchState();
+        showScreen(screenRoundResults);
+      }
+
+      function checkMatchEndCondition() {
+        if (gameMode === 'solo') return false;
+
+        // Если игра до определенного количества очков
+        if (goalType === 'score') {
+          const leader = teams.slice(0, numTeams).reduce((max, t) => t.score > max.score ? t : max, teams[0]);
+          if (leader.score >= goalValue) {
+            // Доигрываем круг чтобы у всех команд было равное количество ходов
+            const isFullCircle = (currentTeamTurnIndex + 1) % numTeams === 0;
+            if (isFullCircle) return true;
+          }
+        }
+
+        // Если игра по кругам
+        if (goalType === 'rounds') {
+          const isLastTeam = currentTeamTurnIndex === numTeams - 1;
+          const isLastRound = currentRoundNumber >= goalValue;
+          if (isLastTeam && isLastRound) return true;
+        }
+
+        return false;
+      }
+
+      nextTurnBtn.addEventListener('click', () => {
+        const matchEnded = checkMatchEndCondition();
+        if (matchEnded) {
+          showPodiumScreen();
+          return;
+        }
+
+        // Переход к следующей команде
+        currentTeamTurnIndex = (currentTeamTurnIndex + 1) % numTeams;
+        if (currentTeamTurnIndex === 0) {
+          currentRoundNumber++;
+        }
+
+        saveActiveMatchState();
+        prepareTurnHandover();
+      });
+
+      function renderTurnCardsList() {
         tabBtnGuessed.classList.toggle('active', activeResultTab === 'guessed');
         tabBtnSkipped.classList.toggle('active', activeResultTab === 'skipped');
 
-        const list = activeResultTab === 'guessed' ? guessedCards : skippedCards;
-        resultsListBox.innerHTML = '';
+        const list = activeResultTab === 'guessed' ? roundGuessed : roundSkipped;
+        roundCardsList.innerHTML = "";
 
         if (list.length === 0) {
-          const emptyText = activeResultTab === 'guessed' 
-            ? 'В этом раунде пока нет угаданных карточек.'
-            : 'Отлично! Ни одной карточки не было пропущено.';
-          resultsListBox.innerHTML = `<div class="empty-list-notice">${emptyText}</div>`;
+          const emptyMsg = activeResultTab === 'guessed' ? 'В этом раунде нет угаданных карточек.' : 'Ни одной карточки не было пропущено!';
+          roundCardsList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.85rem;">${emptyMsg}</div>`;
           return;
         }
 
@@ -1565,78 +1947,106 @@
           const row = document.createElement('div');
           row.className = 'result-word-row';
           row.innerHTML = `
-            <div class="result-word-info">
-              <span class="result-word-text">${escapeHtml(item.word)}</span>
-              <span class="result-word-hint">${escapeHtml(item.hint)}</span>
+            <div>
+              <div class="result-word-text">${escapeHtml(item.word)}</div>
+              <div class="result-word-hint">${escapeHtml(item.hint)}</div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
-              <span class="result-word-category">${escapeHtml(item.category)}</span>
-              ${item.code ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">Знак ${escapeHtml(item.code)}</span>` : ''}
-            </div>
+            <div style="font-size: 0.72rem; color: var(--iof-orange); font-weight: 700; white-space: nowrap;">Знак ${item.code}</div>
           `;
-          resultsListBox.appendChild(row);
+          roundCardsList.appendChild(row);
         });
       }
 
-      function escapeHtml(str) {
-        if (!str) return '';
-        return str
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-
-      /* ==========================================================================
-         ОБРАБОТЧИКИ СОБЫТИЙ (EVENT LISTENERS)
-         ========================================================================== */
-      // Выбор времени раунда (30, 60, 90 секунд)
-      timeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          timeButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          selectedRoundDuration = parseInt(btn.getAttribute('data-time'), 10) || 60;
-        });
-      });
-
-      // Старт и переход между раундами
-      startGameBtn.addEventListener('click', startNewRound);
-      nextRoundBtn.addEventListener('click', startNewRound);
-      toSettingsBtn.addEventListener('click', () => {
-        if (timerInterval) clearInterval(timerInterval);
-        showScreen('settings');
-      });
-
-      // Кнопки ответа во время игры
-      btnGuess.addEventListener('click', handleGuess);
-      btnSkip.addEventListener('click', handleSkip);
-
-      // Вкладки списка результатов
       tabBtnGuessed.addEventListener('click', () => {
         activeResultTab = 'guessed';
-        renderResultsList();
-      });
-      tabBtnSkipped.addEventListener('click', () => {
-        activeResultTab = 'skipped';
-        renderResultsList();
+        renderTurnCardsList();
       });
 
-      // Переключатель звука
-      soundToggleBtn.addEventListener('click', () => {
-        soundEnabled = !soundEnabled;
-        soundIconOn.style.display = soundEnabled ? 'block' : 'none';
-        soundIconOff.style.display = soundEnabled ? 'none' : 'block';
-        if (soundEnabled) playSound('guess');
+      tabBtnSkipped.addEventListener('click', () => {
+        activeResultTab = 'skipped';
+        renderTurnCardsList();
       });
 
       /* ==========================================================================
-         СВАЙПЫ ДЛЯ ТЕЛЕФОНА И ПК (TOUCH / POINTER GESTURES)
+         ПЬЕДЕСТАЛ ПОЧЕТА (ФИНАЛ)
+         ========================================================================== */
+      function showPodiumScreen() {
+        // Удаляем сохраненную игру, так как матч завершен
+        localStorage.removeItem(STORAGE_KEY_STATE);
+
+        // Сортировка команд по очкам
+        const sorted = [...teams.slice(0, numTeams)].sort((a, b) => b.score - a.score);
+
+        const first = sorted[0];
+        const second = sorted[1] || null;
+        const third = sorted[2] || null;
+
+        podiumStage.innerHTML = `
+          ${second ? `
+            <div class="podium-column">
+              <div class="podium-team-badge">
+                <div class="podium-team-name" style="color: ${second.color};">${escapeHtml(second.name)}</div>
+                <div class="podium-team-score">${second.score} очк.</div>
+              </div>
+              <div class="podium-block podium-place-2">
+                <span class="podium-rank-num">2</span>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="podium-column">
+            <div class="podium-team-badge">
+              <div class="podium-team-name" style="color: ${first.color}; font-size: 1.1rem;">🏆 ${escapeHtml(first.name)}</div>
+              <div class="podium-team-score" style="color: #fbbf24;">${first.score} очк.</div>
+            </div>
+            <div class="podium-block podium-place-1">
+              <span class="podium-rank-num">1</span>
+            </div>
+          </div>
+
+          ${third ? `
+            <div class="podium-column">
+              <div class="podium-team-badge">
+                <div class="podium-team-name" style="color: ${third.color};">${escapeHtml(third.name)}</div>
+                <div class="podium-team-score">${third.score} очк.</div>
+              </div>
+              <div class="podium-block podium-place-3">
+                <span class="podium-rank-num">3</span>
+              </div>
+            </div>
+          ` : ''}
+        `;
+
+        // Список всех команд
+        podiumFinalList.innerHTML = sorted.map((t, idx) => `
+          <div class="mini-lead-row" style="background: var(--surface-card); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-weight: 800; color: ${t.color};">${idx + 1}. ${escapeHtml(t.name)}</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Состав: ${escapeHtml(t.players.join(', '))}</div>
+            </div>
+            <span style="font-size: 1.2rem; font-weight: 900; font-variant-numeric: tabular-nums;">${t.score}</span>
+          </div>
+        `).join('');
+
+        showScreen(screenPodium);
+      }
+
+      rematchBtn.addEventListener('click', () => {
+        startNewMatch();
+      });
+
+      newGameBtn.addEventListener('click', () => {
+        checkActiveGameSaved();
+        showScreen(screenSettings);
+      });
+
+      /* ==========================================================================
+         СВАЙПЫ ЖЕСТАМИ (TOUCH & POINTER)
          ========================================================================== */
       let isDragging = false;
       let startY = 0;
       let currentDeltaY = 0;
-      const SWIPE_THRESHOLD = 60; // Порог смещения в px для завершения свайпа
+      const SWIPE_THRESHOLD = 60;
 
       function resetCardPosition() {
         wordCard.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease';
@@ -1647,7 +2057,7 @@
       }
 
       wordCard.addEventListener('pointerdown', (e) => {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0) return;
+        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
         isDragging = true;
         startY = e.clientY;
         currentDeltaY = 0;
@@ -1659,18 +2069,15 @@
         if (!isDragging) return;
         currentDeltaY = e.clientY - startY;
 
-        // Плавное следование за пальцем
         const scale = Math.max(0.95, 1 - Math.abs(currentDeltaY) / 1000);
         wordCard.style.transform = `translate3d(0, ${currentDeltaY}px, 0) scale(${scale})`;
 
         if (currentDeltaY < -15) {
-          // Движение вверх — Угадано
           wordCard.classList.add('dragging-up');
           wordCard.classList.remove('dragging-down');
           wordCard.style.borderColor = 'rgba(34, 197, 94, 0.8)';
           wordCard.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.3)';
         } else if (currentDeltaY > 15) {
-          // Движение вниз — Пропуск
           wordCard.classList.add('dragging-down');
           wordCard.classList.remove('dragging-up');
           wordCard.style.borderColor = 'rgba(239, 68, 68, 0.8)';
@@ -1692,13 +2099,10 @@
         } catch (err) {}
 
         if (currentDeltaY < -SWIPE_THRESHOLD) {
-          // Завершенный свайп вверх — Угадано!
           handleGuess();
         } else if (currentDeltaY > SWIPE_THRESHOLD) {
-          // Завершенный свайп вниз — Пропуск!
           handleSkip();
         } else {
-          // Недостаточное смещение — возврат на место
           resetCardPosition();
         }
       }
@@ -1710,9 +2114,9 @@
         resetCardPosition();
       });
 
-      // Горячие клавиши для клавиатуры (ПК: только Стрелка Вверх и Стрелка Вниз)
+      // Клавиатура (ПК: только Стрелка Вверх и Стрелка Вниз)
       window.addEventListener('keydown', (e) => {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0) return;
+        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
 
         if (e.code === 'ArrowUp') {
           e.preventDefault();
@@ -1722,6 +2126,37 @@
           handleSkip();
         }
       });
+
+      // Звуковой переключатель
+      soundToggleBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundIconOn.style.display = soundEnabled ? 'block' : 'none';
+        soundIconOff.style.display = soundEnabled ? 'none' : 'block';
+        if (soundEnabled) playSound('guess');
+      });
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function shuffleArray(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      // Инициализация при загрузке
+      setupSettingsEvents();
+      loadConfig();
     </script>
   </body>
 </html>
