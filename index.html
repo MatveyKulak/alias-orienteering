@@ -1241,7 +1241,7 @@
           </div>
 
           <!-- Лаконичная полоса подсказок управления -->
-          <div class="swipe-helper-bar">
+          <div id="swipeHelperBar" class="swipe-helper-bar">
             Свайп вверх / [↑] — Угадано &nbsp;•&nbsp; Свайп вниз / [↓] — Пропуск
           </div>
         </div>
@@ -1533,9 +1533,9 @@
           case "311":
             return `<svg viewBox="0 0 80 50"><rect x="34" y="19" width="12" height="12" fill="none" stroke="#0284c7" stroke-width="3"/></svg>`;
           case "312":
-            return `<svg viewBox="0 0 80 50"><path d="M 31 18 Q 31 31 38 31 Q 45 31 45 18 M45 27 Q51 25 55 29 Q59 33 63 28" stroke="#0284c7" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M18 23 C14 15 20 11 26 15 C31 19 27 28 34 30 C41 32 41 20 48 19 C55 18 55 25 61 20 C65 17 67 14 70 13" stroke="#00a6df" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
           case "313":
-            return `<svg viewBox="0 0 80 50"><path d="M40 14V36 M30 25H50 M32 17L48 33 M48 17L32 33" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M40 12V38 M27 18L53 32 M53 18L27 32" stroke="#00a6df" stroke-width="5.5" stroke-linecap="round"/></svg>`;
 
           // 4.4 Растительность
           case "401":
@@ -1718,6 +1718,8 @@
       let roundScoresBefore = [];
       let activeResultTab = "guessed";
       let isPaused = false;
+      let lastWordMode = false;
+      let roundEnding = false;
       let soundEnabled = true;
 
       // Длина окружности SVG таймера
@@ -1859,6 +1861,7 @@
       const roundCardsList = document.getElementById('roundCardsList');
       const roundLeaderboardBlock = document.getElementById('roundLeaderboardBlock');
       const nextTurnBtn = document.getElementById('nextTurnBtn');
+      const swipeHelperBar = document.getElementById('swipeHelperBar');
 
       const podiumStage = document.getElementById('podiumStage');
       const podiumFinalList = document.getElementById('podiumFinalList');
@@ -2206,6 +2209,10 @@
         roundScoresBefore = [];
         timeLeft = roundDuration;
         isPaused = false;
+        lastWordMode = false;
+        roundEnding = false;
+        swipeHelperBar.textContent = 'Свайп вверх / [↑] — Угадано • Свайп вниз / [↓] — Пропуск';
+        wordCard.querySelector('.swipe-cue-down').style.display = '';
 
         const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : { name: "Разминка", color: "var(--iof-orange)" };
         hudTeamDot.style.background = team.color;
@@ -2272,18 +2279,27 @@
       }
 
       function handleGuess() {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
+        if (!screenGame.classList.contains('active') || (!lastWordMode && timeLeft <= 0) || isPaused || roundEnding) return;
         playSound('guess');
 
         const card = deck[cardIdx];
         roundGuessed.push(card);
         gameScoreGuessed.textContent = roundGuessed.length;
 
-        animateCard('guess');
+        if (lastWordMode) {
+          roundEnding = true;
+          animateCard('final-guess');
+        } else {
+          animateCard('guess');
+        }
       }
 
       function handleSkip() {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
+        if (!screenGame.classList.contains('active') || (!lastWordMode && timeLeft <= 0) || isPaused || roundEnding) return;
+        if (lastWordMode) {
+          resetCardPosition();
+          return;
+        }
         playSound('skip');
 
         const card = deck[cardIdx];
@@ -2295,13 +2311,17 @@
 
       function animateCard(action) {
         wordCard.style.transition = 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease';
-        if (action === 'guess') {
+        if (action === 'guess' || action === 'final-guess') {
           wordCard.classList.add('card-exit-guess-up');
         } else {
           wordCard.classList.add('card-exit-skip-down');
         }
 
         setTimeout(() => {
+          if (action === 'final-guess') {
+            finishCurrentTurn();
+            return;
+          }
           cardIdx++;
           renderCurrentCard();
         }, 160);
@@ -2324,9 +2344,20 @@
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
-            finishCurrentTurn();
+            startLastWordMode();
           }
         }, 1000);
+      }
+
+      function startLastWordMode() {
+        lastWordMode = true;
+        timerDisplay.textContent = '∞';
+        timerBarCircle.style.strokeDashoffset = TIMER_CIRCUMFERENCE;
+        timerCircle.classList.remove('warning');
+        timerCircle.classList.add('danger');
+        swipeHelperBar.textContent = 'Последнее слово ∞ — угадывает любая команда. Пропуск недоступен.';
+        wordCard.querySelector('.swipe-cue-down').style.display = 'none';
+        playSound('buzzer');
       }
 
       function updateTimerDisplay() {
@@ -2376,7 +2407,7 @@
          ЗАВЕРШЕНИЕ ХОДА И ПОДВЕДЕНИЕ ИТОГОВ
          ========================================================================== */
       function finishCurrentTurn() {
-        playSound('buzzer');
+        if (!lastWordMode) playSound('buzzer');
 
         const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : teams[0];
         roundScoresBefore = teams.map(t => t.score);
@@ -2622,7 +2653,7 @@
       }
 
       wordCard.addEventListener('pointerdown', (e) => {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
+        if (!screenGame.classList.contains('active') || (!lastWordMode && timeLeft <= 0) || isPaused || roundEnding) return;
         isDragging = true;
         startY = e.clientY;
         currentDeltaY = 0;
@@ -2681,7 +2712,7 @@
 
       // Клавиатура (ПК: только Стрелка Вверх и Стрелка Вниз)
       window.addEventListener('keydown', (e) => {
-        if (!screenGame.classList.contains('active') || timeLeft <= 0 || isPaused) return;
+        if (!screenGame.classList.contains('active') || (!lastWordMode && timeLeft <= 0) || isPaused || roundEnding) return;
 
         if (e.code === 'ArrowUp') {
           e.preventDefault();
