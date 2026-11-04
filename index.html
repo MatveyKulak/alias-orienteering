@@ -1067,10 +1067,21 @@
             </div>
           </div>
 
+          <!-- Выбор картографического стандарта: колоды не смешиваются -->
+          <div>
+            <label class="setting-label">Набор знаков</label>
+            <div class="segmented-control" style="grid-template-columns: 1fr 1fr;">
+              <button type="button" class="segment-btn active" data-standard="sprint">Спринт · ISSprOM</button>
+              <button type="button" class="segment-btn" data-standard="forest">Лес · ISOM</button>
+            </div>
+            <div id="standardDesc" class="diff-desc">Спринтовые знаки ISSprOM. В колоду не попадут лесные знаки ISOM.</div>
+          </div>
+
           <!-- Выбор уровня сложности -->
           <div>
             <label class="setting-label">Уровень сложности</label>
-            <div class="segmented-control" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="segmented-control" style="grid-template-columns: repeat(4, 1fr);">
+              <button type="button" class="segment-btn" data-diff="ultrahard">☠ Ультра</button>
               <button type="button" class="segment-btn" data-diff="hard">🔥 Хард</button>
               <button type="button" class="segment-btn active" data-diff="medium">⚡ Средний</button>
               <button type="button" class="segment-btn" data-diff="easy">🌱 Легкий</button>
@@ -1089,6 +1100,18 @@
                 <button type="button" class="segment-btn" data-teams="3">3 команды</button>
                 <button type="button" class="segment-btn" data-teams="4">4 команды</button>
               </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+              <label class="setting-label">Размер команды</label>
+              <div class="segmented-control" style="grid-template-columns: repeat(5, 1fr);">
+                <button type="button" class="segment-btn" data-players="2">2</button>
+                <button type="button" class="segment-btn" data-players="3">3</button>
+                <button type="button" class="segment-btn active" data-players="4">4</button>
+                <button type="button" class="segment-btn" data-players="5">5</button>
+                <button type="button" class="segment-btn" data-players="6">6</button>
+              </div>
+              <div class="diff-desc">Сначала выберите размер команды, затем укажите её название и игроков.</div>
             </div>
 
             <!-- Список команд и игроков -->
@@ -1228,9 +1251,10 @@
       <section id="screenRoundResults" class="screen">
         <div style="display: flex; flex-direction: column; gap: 14px; flex: 1;">
           <div class="results-summary-box">
-            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Время вышло!</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Проверка слов после раунда</div>
             <h2 id="roundResultTeamTitle" style="font-size: 1.5rem; font-weight: 900;">Команда Азимут</h2>
             <div class="round-result-score"><span id="roundPlusSign">+</span><span id="roundResultPoints">0</span> <span>очков</span></div>
+            <div style="margin-top: 8px; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.4;">Назначьте балл за каждое слово: это позволяет отдать последнее слово первой ответившей команде или исправить случайный пропуск.</div>
           </div>
 
           <!-- Вкладки угаданных / пропущенных -->
@@ -1288,23 +1312,24 @@
     <!-- СКРИПТ: База данных, отрисовка знаков ISSprOM и логика игры -->
     <script>
       /* ==========================================================================
-         БАЗА ДАННЫХ: ВСЕ 102 ОФИЦИАЛЬНЫХ ЗНАКА ISSprOM 2019-2 С ПОДСКАЗКАМИ И СЛЕНГОМ
+         БАЗА ДАННЫХ: ОБЩИЕ, СПРИНТОВЫЕ ISSprOM И ЛЕСНЫЕ ISOM ЗНАКИ
          ========================================================================== */
       const orienteeringWords = [
         // 4.1 Рельеф
         { id: 1, code: "101", word: "Горизонталь", category: "Рельеф", hint: "Линия равных высот на карте (сечение 2 или 2,5 м)", clue: "Коричневая плавная линия на карте, по которой определяют высоту холмов и склонов!" },
-        { id: 2, code: "102", word: "Утолщенная горизонталь", category: "Рельеф", hint: "Каждая пятая горизонталь более толстой линией для счета высоты", clue: "Каждая пятая жирная коричневая линия! Нужна, чтобы быстро считать перепад высот." },
-        { id: 3, code: "103", word: "Вспомогательная горизонталь", category: "Рельеф", hint: "Пунктирная горизонталь между основными для мелких форм", clue: "Коричневый пунктир рельефа! Показывает седловинку или полочку между основными высотами." },
-        { id: 4, code: "104", word: "Грунтовый обрыв", category: "Рельеф", hint: "Резкое изменение уровня грунта, карьер или насыпь со штрихами", clue: "Земляной срез с коричневыми зубчиками вниз, где осыпался грунт, берег оврага или насыпь!" },
-        { id: 5, code: "105", word: "Небольшой грунтовый вал", category: "Рельеф", hint: "Выделяющийся узкий грунтовый вал от 0,5 м", clue: "Коричневая насыпная гряда, вал от старого окопа или канавы в парке." },
-        { id: 6, code: "107", word: "Овраг, промоина или траншея", category: "Рельеф", hint: "Узкая промоина одной линией глубиной от 1 м с заостренным концом", clue: "Глубокая размытая канава в земле, сужающаяся клином к началу размыва!" },
-        { id: 7, code: "108", word: "Небольшая промоина или канава", category: "Рельеф", hint: "Мелкий эрозионный овраг (пунктир из коричневых точек)", clue: "Мелкий коричневый пунктирчик размыва водой — неглубокая канавка на склоне." },
+        { id: 2, code: "102", word: "Утолщенная горизонталь", category: "Рельеф", hint: "Каждая пятая горизонталь более толстой линией для счета высоты", clue: "Жирная горизонталь: каждая пятая более толстая коричневая линия. По ней быстро считают перепад высот." },
+        { id: 3, code: "103", word: "Вспомогательная горизонталь", category: "Рельеф", hint: "Тонкая длинноштриховая горизонталь между основными для мелких форм", clue: "Полугоризонталь: тонкие длинные коричневые штрихи для мелких форм между основными горизонталями." },
+        { id: 4, code: "104", word: "Грунтовый обрыв", category: "Рельеф", hint: "Резкое изменение уровня грунта, карьер или насыпь со штрихами", clue: "Обрыв: земляной срез с коричневыми зубчиками вниз, например берег оврага или край насыпи." },
+        { id: 5, code: "105", word: "Небольшой грунтовый вал", category: "Рельеф", hint: "Выделяющийся узкий грунтовый вал от 0,5 м", clue: "Насыпь: коричневая насыпная гряда или вал от старого окопа." },
+        { id: 106, code: "106", word: "Разрушенная насыпь", category: "Рельеф", hint: "ISOM: разрушенный или менее отчётливый земляной вал высотой от 0,5 м (тонкая линия с точками)", clue: "Старая разрушенная насыпь: земляной вал уже расплылся и заметен хуже обычного." },
+        { id: 6, code: "107", word: "Овраг, промоина или траншея", category: "Рельеф", hint: "ISOM: овраг, слишком малый для грунтового обрыва; отображается одной линией с ветвлением", clue: "Промоина: глубокая размытая канава в земле, сужающаяся клином к началу размыва." },
+        { id: 7, code: "108", word: "Небольшая промоина или канава", category: "Рельеф", hint: "Мелкий эрозионный овраг (пунктир из коричневых точек)", clue: "Траншея: неглубокая канавка на склоне, показанная коричневыми точками." },
         { id: 8, code: "109", word: "Небольшой холмик, бугорок", category: "Рельеф", hint: "Характерный холмик или горка (коричневая точка)", clue: "Коричневая круглая точечка! Маленькая горка или курганчик посреди поляны." },
-        { id: 9, code: "110", word: "Небольшой вытянутый холм, бугорок", category: "Рельеф", hint: "Вытянутый бугорок длиной до 6 м (коричневый эллипс)", clue: "Коричневый овальчик или сосиска на карте! Узкая насыпь или возвышенность." },
-        { id: 10, code: "111", word: "Небольшое понижение", category: "Рельеф", hint: "Неглубокая естественная впадина (полукруг на север)", clue: "Коричневая полукруглая дужка — впадинка или блюдце с пологими краями." },
+        { id: 9, code: "110", word: "Небольшой вытянутый холм, бугорок", category: "Рельеф", hint: "Вытянутый бугорок длиной до 6 м (коричневый эллипс)", clue: "Вытянутый бугор: коричневый овальчик — узкая насыпь или возвышенность." },
+        { id: 10, code: "111", word: "Небольшое понижение", category: "Рельеф", hint: "Неглубокая естественная впадина (полукруг на север)", clue: "Микроямка: коричневая полукруглая дужка — небольшая впадинка с пологими краями." },
         { id: 11, code: "112", word: "Яма или воронка", category: "Рельеф", hint: "Яма с четко выраженными крутыми сторонами (шеврон V на север)", clue: "Коричневая галочка «V», острием вниз на север! Окоп, воронка от взрыва или карст." },
-        { id: 12, code: "113", word: "Неровный грунт", category: "Рельеф", hint: "Область мелких ям или холмов (случайные коричневые точки)", clue: "Коричневый бисер! Россыпь мелких кочек и ямок, где спотыкаются ноги." },
-        { id: 13, code: "115", word: "Характерный элемент рельефа", category: "Рельеф", hint: "Заметная особенность рельефа (равносторонний коричневый треугольник)", clue: "Коричневый равносторонний треугольник на карте! Уникальный заметный бугор или геодезический ориентир." },
+        { id: 12, code: "113", word: "Неровный грунт", category: "Рельеф", hint: "Область мелких ям или холмов (случайные коричневые точки)", clue: "Микронеровности: россыпь мелких кочек и ямок, где спотыкаются ноги." },
+        { id: 13, code: "115", word: "Характерный элемент рельефа", category: "Рельеф", hint: "Заметная особенность рельефа (малый равносторонний коричневый треугольник)", clue: "Муравейник: заметный небольшой объект рельефа, отмеченный коричневым треугольником." },
 
         // 4.2 Камни и скалы
         { id: 14, code: "201", word: "Непреодолимый скальный обрыв", category: "Камни и скалы", hint: "Вертикальная стена со штрихами вниз (запрещено преодолевать!)", clue: "Жирная черная линия с гребнем зубьев! Отвесная стена, прыгать с которой строго запрещено — дисквал!" },
@@ -1323,11 +1348,11 @@
         { id: 25, code: "301", word: "Непроходимый водоем", category: "Гидрография", hint: "Глубокое озеро, река, бассейн (темно-синий с черным контуром, нельзя пересекать!)", clue: "Синяя заливка с толстым черным контуром! Озеро или глубокий пруд — плыть запрещено, только обегать!" },
         { id: 26, code: "302", word: "Преодолимый водоем", category: "Гидрография", hint: "Мелководный водоем или брод до 0,5 м (синий контур)", clue: "Голубое пятно без черного контура — мелкая лужа или брод по колено, можно бежать напрямик." },
         { id: 27, code: "303", word: "Яма с водой", category: "Гидрография", hint: "Заполненная водой яма или углубление (синий шеврон V на север)", clue: "Синяя галочка «V» на север! Затопленная воронка или канавка с водой." },
-        { id: 28, code: "305", word: "Малый пересекаемый водоток", category: "Гидрография", hint: "Ручей шириной менее 2 метров (синяя линия)", clue: "Тонкая синяя нитка — журчащий лесной ручей, через который легко перепрыгнуть." },
-        { id: 29, code: "306", word: "Пересыхаемый / сезонный водоток", category: "Гидрография", hint: "Русло, содержащее воду временно (синий пунктир)", clue: "Синий пунктирчик — сухое русло, где вода шумит только весной во время таяния снега." },
+        { id: 28, code: "305", word: "Малый пересекаемый водоток", category: "Гидрография", hint: "Ручей шириной менее 2 метров (синяя линия)", clue: "Преодолимый ручей: тонкая синяя нитка, через которую легко перепрыгнуть." },
+        { id: 29, code: "306", word: "Пересыхаемый / сезонный водоток", category: "Гидрография", hint: "Русло, содержащее воду временно (синий пунктир)", clue: "Сезонный ручей: синяя пунктирная линия русла, в котором вода бывает не всегда." },
         { id: 30, code: "307", word: "Непроходимое болото", category: "Гидрография", hint: "Топкое болото с черным контуром (запрещено пересекать!)", clue: "Синяя частая сетка с черным краем! Трясина и зыбун — вход строжайше закрыт, дисквалификация!" },
         { id: 31, code: "308", word: "Болото", category: "Гидрография", hint: "Проходимое болото с отчетливым краем (синие полосы)", clue: "Синие параллельные полосы с четкой границей — мокрое место с кочками и мхом." },
-        { id: 32, code: "309", word: "Узкое болото", category: "Гидрография", hint: "Узкая заболоченная полоса или ручеек (ряд синих точек)", clue: "Ряд синих точек или узкая полоска между горками — мокрая низина." },
+        { id: 32, code: "309", word: "Водная траншея (узкое болото)", category: "Гидрография", hint: "Официально: узкое болото или очень узкий водоток, который нельзя показать площадью (ряд синих точек)", clue: "Водная траншея: ряд синих точек в узкой мокрой низине." },
         { id: 33, code: "310", word: "Заболоченность", category: "Гидрография", hint: "Нечеткое или сезонное проходимое болото (пунктирные синие полосы)", clue: "Прерывистые синие штрихи — сырой луг или влажная трава, бежится легко." },
         { id: 34, code: "311", word: "Небольшой фонтан или колодец", category: "Гидрография", hint: "Фонтан или колодец диаметром от 1 м (синий квадрат)", clue: "Синий квадратик на карте! Городской питьевой фонтанчик или колодец со срубом." },
         { id: 35, code: "312", word: "Родник", category: "Гидрография", hint: "Источник воды с оттоком (синяя дуга по течению)", clue: "Синяя дужка с хвостиком — бьющий из склона родник чистой ключевой воды." },
@@ -1338,24 +1363,24 @@
         { id: 38, code: "402", word: "Открытая местность с отдельными деревьями", category: "Растительность", hint: "Редкий лес, луг или парк с деревьями", clue: "Желтый фон с белыми кружками — городской парк или сквер с редкими деревьями." },
         { id: 39, code: "403", word: "Неудобная для бега открытая местность (неудобь)", category: "Растительность", hint: "Вырубка, вересковая пустошь или высокая трава (50% желтый)", clue: "Неудобь (светло-желтый 50%)! Бурьян, крапива по пояс или заросшая вырубка." },
         { id: 40, code: "404", word: "Неудобь с редким лесом", category: "Растительность", hint: "Высокая трава с отдельными деревьями (50% желтый с точками)", clue: "Светло-желтый с точечками — высокая трава с одинокими раскидистыми березами." },
-        { id: 41, code: "405", word: "Лес", category: "Растительность", hint: "Типичный чистый легкопроходимый лес для максимальной скорости (белый цвет)", clue: "Белый цвет на карте ориентировщика! Чистый бор, где летишь на максимальной скорости!" },
-        { id: 42, code: "406", word: "Растительность: медленный бег", category: "Растительность", hint: "Густой лес со снижением скорости до 60-80% (зеленый растр 30%)", clue: "«Зеленка-единичка» (светло-зеленый)! Кустарник, скорость бега падает до 70%." },
-        { id: 43, code: "407", word: "Растительность: бег затруднен, хорошая видимость", category: "Растительность", hint: "Низкие заросли со снижением скорости бега (зеленые вертикальные полосы)", clue: "Зеленые вертикальные полоски! Внизу кусты путаются под ногами, а вдаль всё просматривается." },
-        { id: 44, code: "408", word: "Растительность: движение пешком", category: "Растительность", hint: "Густой лес со снижением скорости до 20-60% (зеленый растр 60%)", clue: "«Зеленка-двойка» (средне-зеленый)! Чаща, где бежать уже невозможно — только пешком." },
+        { id: 41, code: "405", word: "Лес", category: "Растительность", hint: "Типичный чистый легкопроходимый лес для максимальной скорости (белый цвет)", clue: "Белый лес, или первая зелёнка: чистый бор, где можно бежать быстро." },
+        { id: 42, code: "406", word: "Растительность: медленный бег", category: "Растительность", hint: "Густой лес со снижением скорости до 60-80% (зеленый растр 30%)", clue: "Вторая зелёнка, или зелёный лес: кустарник замедляет бег, но через него ещё бежится." },
+        { id: 43, code: "407", word: "Растительность: бег затруднен, хорошая видимость", category: "Растительность", hint: "Низкие заросли со снижением скорости бега (зеленые вертикальные полосы)", clue: "Растения по бедро: кусты путаются под ногами, но вдаль всё хорошо просматривается." },
+        { id: 44, code: "408", word: "Растительность: движение пешком", category: "Растительность", hint: "Густой лес со снижением скорости до 20-60% (зеленый растр 60%)", clue: "Третья зелёнка: тёмный лес, где обычно уже не бежится, а продираешься пешком." },
         { id: 45, code: "409", word: "Растительность: движение пешком, хорошая видимость", category: "Растительность", hint: "Заросли со снижением скорости до 20-60% при открытом обзоре (частые полосы)", clue: "Частые зеленые полосы! Густой подлесок с отличной видимостью верхушек деревьев." },
-        { id: 46, code: "410", word: "Растительность: трудно идти", category: "Растительность", hint: "Очень густые заросли со снижением скорости почти до 0% (сплошной зеленый 100%)", clue: "«Зеленка-тройка» (густой темно-зеленый)! Непролазные дебри, малинник и бурелом." },
-        { id: 47, code: "411", word: "Непроходимая растительность", category: "Растительность", hint: "Живая изгородь или плотные заросли (темно-зеленый, запрещено пересекать!)", clue: "Самый темный зеленый цвет! Стриженая плотная городская живая изгородь — лезть сквозь нее запрещено!" },
-        { id: 48, code: "412", word: "Обрабатываемая земля", category: "Растительность", hint: "Сельхозугодья, посевы (запрещено пересекать!)" , clue: "Желтый с черным точечным забором — огород, пашня или клумба! Бежать по посевам нельзя." },
+        { id: 46, code: "410", word: "Растительность: трудно идти", category: "Растительность", hint: "Очень густые заросли со снижением скорости почти до 0% (сплошной зеленый 100%)", clue: "Третья зелёнка, или тёмно-зелёный лес: малинник, бурелом и почти непролазные дебри." },
+        { id: 47, code: "411", word: "Непроходимая растительность", category: "Растительность", hint: "Живая изгородь или плотные заросли (темно-зеленый, запрещено пересекать!)", clue: "Четвёртая зелёнка: живая изгородь или непроходимая растительность, через которую бежать нельзя." },
+        { id: 48, code: "412", word: "Обрабатываемая земля", category: "Растительность", hint: "Сельхозугодья, посевы (запрещено пересекать!)" , clue: "Поле: огород, пашня или клумба. Бежать по посевам нельзя." },
         { id: 49, code: "413", word: "Фруктовый сад", category: "Растительность", hint: "Регулярные посадки плодовых деревьев или кустарников", clue: "Желтый фон с ровными рядами зеленых точек — яблоневый или вишневый сад." },
         { id: 50, code: "414", word: "Виноградник или что-то подобное", category: "Растительность", hint: "Плотные ряды виноградных или ягодных культур", clue: "Ряды натянутой проволоки с лозой — вдоль бежать легко, а поперек застрянешь!" },
-        { id: 51, code: "415", word: "Четкая граница культивирования", category: "Растительность", hint: "Черная линия границы обрабатываемых земель или садов", clue: "Тонкая сплошная черная линия, отделяющая пашню или клумбу от дороги." },
+        { id: 51, code: "415", word: "Четкая граница культивирования", category: "Растительность", hint: "Граница обрабатываемых земель или садов; культивирование — возделывание земли человеком", clue: "Тонкая сплошная черная линия, отделяющая пашню или клумбу от дороги." },
         { id: 52, code: "416", word: "Четкая граница растительности", category: "Растительность", hint: "Опушка леса или край посадок (пунктир из черных точек)", clue: "Черные круглые точки цепочкой — четкая опушка леса или граница высокой посадки." },
         { id: 53, code: "417", word: "Выделяющееся большое дерево", category: "Растительность", hint: "Крупное одиночное дерево (зеленый кружок с белой маской)", clue: "Зеленый кружок с белым ободком! Вековой раскидистый дуб посреди поляны." },
         { id: 54, code: "418", word: "Выделяющийся куст или небольшое дерево", category: "Растительность", hint: "Одинокий куст или небольшое дерево (зеленый кружок с белой точкой)", clue: "Зеленый кружочек с белой точкой в центре — одинокая туя или куст сирени." },
-        { id: 55, code: "419", word: "Характерный объект растительности", category: "Растительность", hint: "Приметная особенность флоры (зеленый крест на север)", clue: "Зеленый крестик, смотрящий на север! Одинокий трухлявый пень, коряга или пальма." },
+        { id: 55, code: "419", word: "Характерный объект растительности", category: "Растительность", hint: "Приметная особенность флоры (зеленый диагональный крест на север)", clue: "Корч: заметный объект растительности — пень, коряга, огромный куст или другой ориентир." },
 
         // 4.5 Искусственные объекты
-        { id: 56, code: "501", word: "Мощеная площадка", category: "Искусственные объекты", hint: "Твердое покрытие: асфальт, плитка, бетон (коричневый 30% или 50%)", clue: "Коричневый цвет 50%! Твердый городской асфальт, брусчатка, плитка или бетонная площадь." },
+        { id: 56, code: "501", word: "Мощеная площадка", category: "Искусственные объекты", hint: "Твердое покрытие: асфальт, плитка, бетон (коричневый 30% или 50%)", clue: "Асфальтная площадка: твердое городское покрытие — асфальт, брусчатка, плитка или бетон." },
         { id: 57, code: "501.1", word: "Ступенька или край мощеной площадки", category: "Искусственные объекты", hint: "Бордюр или край мощеной зоны (тонкая черная линия)", clue: "Тонкая черная линия на асфальте — бордюрный камень или край тротуара." },
         { id: 58, code: "501.2", word: "Ступенька или край площадки на нижнем уровне", category: "Искусственные объекты", hint: "Край площадки на нижнем ярусе двухуровневой зоны (черный пунктир)", clue: "Черный пунктир на коричневом — бордюр под мостом или на нижнем ярусе парковки." },
         { id: 59, code: "501.3", word: "Мощеная площадка с отдельными деревьями", category: "Искусственные объекты", hint: "Площадь, сквер или тротуар с деревьями", clue: "Коричневая плиточная площадь с кружочками деревьев и клумбами." },
@@ -1385,32 +1410,53 @@
         { id: 83, code: "526", word: "Пирамида из камней или памятник", category: "Искусственные объекты", hint: "Каменный тур, мемориал или пограничный знак (черное кольцо с точкой)", clue: "Черное колечко с точкой в центре — каменный тур на макушке сопки или памятник." },
         { id: 84, code: "527", word: "Кормушка", category: "Искусственные объекты", hint: "Кормовая стойка для лесных животных (черная стрелка с перекладиной)", clue: "Черная стрелочка с перекладиной — лесные ясли с сеном для лосей и косуль." },
         { id: 85, code: "528", word: "Искусственный линейный объект", category: "Искусственные объекты", hint: "Низкий надземный трубопровод или желоб (линия со стрелками)", clue: "Тонкая линия со стрелочками — низкая газовая труба или водосточный желоб." },
-        { id: 86, code: "529", word: "Непреодолимый искусственный линейный объект", category: "Искусственные объекты", hint: "Магистральный трубопровод (толстая линия с двойными стрелками, нельзя пересекать)", clue: "Жирная линия с двойными уголками — огромный магистральный теплопровод, через который не перелезть!" },
+        { id: 86, code: "529", word: "Непреодолимый искусственный линейный объект", category: "Искусственные объекты", hint: "Высокий трубопровод или другой рукотворный линейный объект, который нельзя пересекать", clue: "Непреодолимый трубопровод: жирная линия с двойными уголками, через которую не перелезть. Для преодолимого используют знак 528." },
         { id: 87, code: "530", word: "Выделяющийся искусственный объект – кольцо", category: "Искусственные объекты", hint: "Приметный круглый искусственный объект (черное кольцо)", clue: "Черная пустая окружность (бублик) — круглый колодец, круглая клумба или фонтан." },
         { id: 88, code: "531", word: "Выделяющийся искусственный объект", category: "Искусственные объекты", hint: "Особый рукотворный объект (черный косой крест)", clue: "Черный косой крест «Х» — детская горка, трансформаторная будка или турник." },
-        { id: 89, code: "532", word: "Лестница", category: "Искусственные объекты", hint: "Уличная лестница или ступени (линия с перекладинами ступеней)", clue: "Линия с частыми поперечными перекладинами — крутая городская лестница между домами." },
+        { id: 89, code: "532", word: "Лестница", category: "Искусственные объекты", hint: "Уличная лестница или ступени (линия с перекладинами ступеней)", clue: "Узкая линия с частыми поперечными перекладинами — городская лестница между домами." },
 
         // 4.6 Технические символы
         { id: 90, code: "601", word: "Линия магнитного меридиана", category: "Технические знаки", hint: "Линии на карте, указывающие направление на магнитный север", clue: "Тонкие синие или черные вертикальные полосы через всю карту — смотрят строго на магнитный север!" },
 
         // 4.7 Знаки элементов трассы
-        { id: 91, code: "701", word: "Начало ориентирования", category: "Знаки трассы", hint: "Точка старта и выдачи карт (фиолетовый равносторонний треугольник)", clue: "Фиолетовый треугольник! Место, где судьи кричат «Старт!», и ты переворачиваешь карту." },
-        { id: 92, code: "702", word: "Пункт выдачи карты", category: "Знаки трассы", hint: "Место выдачи карт на трассе (фиолетовая поперечная черта)", clue: "Фиолетовая поперечная черточка на пути от старта к началу ориентирования." },
+        { id: 91, code: "701", word: "Начало ориентирования", category: "Знаки трассы", hint: "Точка, где начинается ориентирование (фиолетовый равносторонний треугольник)", clue: "Пункт К: фиолетовый треугольник, от которого уже бежишь по своей дистанции к первому КП." },
+        { id: 92, code: "702", word: "Пункт выдачи карты", category: "Знаки трассы", hint: "Место выдачи карт перед маркированным путём к старту", clue: "Фиолетовый дефис: здесь берёшь карту, затем по маркировке бежишь к пункту К." },
         { id: 93, code: "703", word: "Контрольный пункт", category: "Знаки трассы", hint: "Местоположение КП (фиолетовый круг диаметром 24 м на местности)", clue: "Фиолетовый круг на карте! В его центре спрятана оранжево-белая призма со станцией отметки." },
         { id: 94, code: "704", word: "Номер контрольного пункта", category: "Знаки трассы", hint: "Порядковый номер КП на карте шрифтом Arial", clue: "Фиолетовые цифры возле кружка КП — показывают порядковый номер (1, 2, 3...) или код (31, 32...)." },
         { id: 95, code: "705", word: "Линия порядка прохождения трассы", category: "Знаки трассы", hint: "Прямая фиолетовая линия между контрольными пунктами", clue: "Фиолетовый перегон! Прямая линия между двумя кружками КП, указывающая направление следующего пункта." },
         { id: 96, code: "706", word: "Финиш", category: "Знаки трассы", hint: "Конец дистанции (два концентрических фиолетовых круга)", clue: "Два концентрических фиолетовых круга (бублик в бублике)! Место долгожданной финишной отметки!" },
         { id: 97, code: "707", word: "Маркированный участок", category: "Знаки трассы", hint: "Обязательный размеченный участок трассы (фиолетовый пунктир)", clue: "Фиолетовый пунктир — размеченный судейскими лентами обязательный коридор (например, до финиша)." },
-        { id: 98, code: "708", word: "Линия запретная для пересечения", category: "Знаки трассы", hint: "Временная граница на местности, через которую нельзя бежать", clue: "Фиолетовая линия с крестами — натянутая судейская лента, пересекать которую строго запрещено!" },
+        { id: 98, code: "708", word: "Линия запретная для пересечения", category: "Знаки трассы", hint: "Временная граница на местности, через которую нельзя бежать", clue: "Фиолетовая линия — натянутая судейская лента, пересекать которую строго запрещено!" },
         { id: 99, code: "709", word: "Запретная зона", category: "Знаки трассы", hint: "Временная территория, закрытая для прохода участников (фиолетовая штриховка)", clue: "Фиолетовая диагональная штриховка — закрытая зона соревнований, забег туда карается снятием!" },
         { id: 100, code: "710.1", word: "Точка пересечения (переход на трассе)", category: "Знаки трассы", hint: "Специально оборудованный переход через стену/забор (фиолетовые дужки)", clue: "Фиолетовые скобочки в заборе — судейский мостик или калитка для безопасного перехода." },
         { id: 101, code: "710.2", word: "Участок пересечения (коридор на трассе)", category: "Знаки трассы", hint: "Коридор перехода через здание, дорогу или забор (фиолетовая полоса)", clue: "Фиолетовый коридор с полосками — разрешенный проход через оживленное шоссе или стройку." },
         { id: 102, code: "714", word: "Временное сооружение или закрытая область", category: "Знаки трассы", hint: "Трибуны, сцена, палатки или зрительские зоны (фиолетовый контур 50%)", clue: "Фиолетовый контур палатки или сцены — судейский шатер, раздевалки или зона зрителей на спринте." }
       ];
 
+      // Карточки, существующие только в одном наборе. Остальные текущие карточки
+      // общие и могут уточняться независимо при дальнейшем аудите ISOM.
+      const SPRINT_ONLY_CODES = new Set();
+      const FOREST_ONLY_CODES = new Set(["106"]);
+
+      function getWordsForStandard(standard) {
+        return orienteeringWords.filter(item => {
+          if (standard === "sprint") return !FOREST_ONLY_CODES.has(item.code);
+          return !SPRINT_ONLY_CODES.has(item.code);
+        });
+      }
+
+      function getStandardTitle(standard) {
+        return standard === "forest" ? "Лес · ISOM" : "Спринт · ISSprOM";
+      }
+
       /* ==========================================================================
          ВЕКТОРНЫЙ ГЕНЕРАТОР ЗНАКОВ ISSprOM (SVG В ОФИЦИАЛЬНЫХ ЦВЕТАХ IOF)
          ========================================================================== */
+      const REFERENCE_SYMBOL_IMAGES = {
+        "512.1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAACDCAIAAAC88ja5AAAPb0lEQVR4AeydCVgTZxrHJwcC4UZA5CyVQ+X0oFyCV0sVqlSFrdfWIngfPKKr1a622sU+tatbW49qxdZuu9t9BFt98Kiu1V3rfSK6tmBRVFQQkXCE3Nl3mDgJIYQYhkkm8/H8+Xi/7/2ued+fyQwzRK4KfaEImBQBLoa+UARMigBCx6SwoUEYhtBBFJgYAYSOiYFDwxA6iAETI4DQMTFwaBgN6KAgW2cEEDrWmVcajgqhQ0OQrXMJhI515pWGo0Lo0BBk61wCoWOdeaXhqBA6NATZOpewDnSsMzcWflQIHQtPkOVuD6Fjubmx8J0hdCw8QZa7PYSO5ebGwneG0LHwBFnu9hA6lpsbC98ZQsfIBKFuuhFA6OhGBNWNjABCx8hAoW66EUDoYFmZE/NzJz67+I0J+nZjfuab6SqVSjeuLKgjdDCFQqGUNMueVZkgeUvd+culLOBEzyEidPQEBTUZEwGEjjFRQn30RAChoycoZmpi2LIIHYYlzHK2i9CxnFwwbCcIHYYlzHK2i9CxnFwwbCcIHYYlzHK2i9CxnFwwbCcIHYYlrHvbpXI0QofKaHY9V11RbUDvB71wPZpVIu10gFA43veBT17T8w6ij8c89HlZo0EFLc9d5vqJ0KEz8lX1Y+dIm5MFR0845wQq9sx4tkf/6pI9c5qPiLV9stMXlc2u3KRkPqEYb4622xw2QofGqN8slJRi/BWb3UdEOW//3j4Qk326qR0gsBd5bePKkXWzjrW/F18ur8Cw6Bz3vXu8CH2VI4DOZhVCh77wi0tOKTAv/ojAtiVDbeLtsJsXJG0VTfHblpaN17kz8nv5atowrFz+O8bpH8XTbjO3jdChLwPKBiGGBfLD1Cvy/fpgWJWiSl1V//DNdDhxy+vLLB5f3YD/qC6HFyFV8ezHAvwk6eH4wlY53mzeb4QOffGX3dbBBJauUdyBUkuuUc5JXrqvLtd+U0AXfqDtR5sFGV7KI8ufphXKoMWsQujQGH7dNyejl46Y7rB9s/PZIx550933nnNMwrCTu5o6cmj0fJR07AQdSuZGk7SPAD/Mq30D1Fy5nlB2pcBk15zpzv2Ibi4OmbEYVqOAE2eiwUwlQoe+wHPs7DGsVlGtXlHR0IBhAbx2p8Nql84PWV2tuFpIvkNxHe3wDtonQ3id7m+EDvURl5WWCdcUdJxXEB/LwapkJ+FkGZxVsnNCLDzFzhXsLiTbPKYuaFDDSXW35iMXMSzUJkJdNdcPhA71kReuXMvz0vc+lJ5r643JCxYLqyWSPStab2L8yZPsYP3zW2uzZjw7D5Z+CSa/wcOEkiUFIrFE/N2clmIxZ0yuwEN/Z9paEToUh7r5i0KVUuG4cLa+eWPdfniPLy5pCvJ5MusY9uoGl6Vtv+O5fUq6v0RyiXg10jcufJ3r35I5NzfVO/vUZRep4hY4787spa8jnW0IHSqjrah+KFy11qXg/c4m5Q3J966t9Lxzy+NepfehHHvifGXa937Sp94LXLRGhfaueOr3cLPT8yb7BT/6ip4PPLXOydwvObAvhA4EgTIBN05583oNiTE0I9/F1tfLzttF95c3hsa0+Uwe2Daa8sJ86FB+KOaesLXoR9mNW87vrzT3RmhaH6GD9e8fxuWYfh96WuZ4yJVKIm3A36rWKGqfyG7ekpz8BUhq3l7Y+OHHNbHDoYP1CaGD/WXt++9OH2ZaatPiQ9a+u5jD4cBblfJxbV3G5JrByfXTchsLPhHtOyC/9RtM65DzNpTWJ4QONTl1yH27b+V1P0mdz4Nf+1w77Xlsf+9/7Hb9bIPz6hWOc3OoWcPCZkHo4Akpq6xpEnX6yN6ZG/fxTvq+YWBjUzN4bAaEcT16g8EeIXQwuUKx/ptThSVX9Gb9+KXKFduOPRWKOnoVSiUM3Fb4XUcXG1oQOtiWrdvK7z/996XKqxWPdFIO7btKrogksj2HS3VcUC0suQodDh//74ULF6DKNjESnZ07d0ZEhHctg32ITEPWi/ftB/vR06ZDZ3VvRh88Uw5wgPfg2XKdt62rFY9LzpSDq/pRTXFxMRigTZs2dnNXMTHRMA8jxEh0ILLC7n2JROo3oOLionv31acyB89WHL9cCZMTOl12j4ADqg3NYgBL+9O7gKrqJ43gAu3bV3zo0CEwQN3bV+f3ImBqCxNT0aEkjAcOHCgqKiKnkkjlwIdIjD/dIJMrgBsghvQePlcBbBHVoxd+By9hQykWi4Gelhb8fBmqLBF70amvr4eXHKm03YXVyat3D57F34aADOBDBwIAC86XgSfwAlva3p9++qm4eJ92i9XbVKIzYsRwerRt29buJwZeb37++eeO8wAf12t4h6/UdHSd/9+Dg2crgBt4L+vohReeBvzB9Y6eF2hpaGigPIbl5fg/hhfYhHFdqUQnNSmKHoUF+QyN6m+kZk0bP3/GRB3NmjpOIK9dmD0JtGDGhDkZQ0glxUZwfeNSXk1fOPMtspE0+Dyui4PtopwpS5bkL8lbPG/y6PlTxy5smych6iXR06r5HdaCFiO3Ct0GhYekJkVTK4Wo3jgYXqwXlejMfj04d7gXDfp8XuKOvOFGau6ovjkpnh2VGqzKHuYBmpniNXv8UELzp49buX7HqFGj8/PzV6zduGzlWqKdLKe+FjnlnfnLP/gEOuQvW75qw9fzp7wGkxBanhGco28tI7dKdMsd7kmtQoLVTzW/GBpd9aYSna7WsnQ/T+DuEpPFscEf3CP2qpS2EAZZOgQNEwQlklWlXKwQM+myiNx59w22owOnvYSetWLADc9O87xV6/1LzRXtTobs/WMdQkaSQRe3iir/s7vmfiXMQDayx2A7OkfO307N/zuo2mYg31Hzxy7iR2VNtw5rc2DnE+U0YIx2i7Dsh5HZH8HYj779RbudJTbb0SHTzHfUPIgueVLeWPYj6QLD1ivMOSIDDFKNN/ZLa3vkyoVcwsINhI5ugmTP7jWWan5PCO5e7oEu0ZlgkGr69Yj44XWyyk6D7egERycVFu4GEemXN9UIS/eqlPifeBMtfGdv5+gsjKMJVEvFidZ7FwnvpkWvg8YlhRJVVpWaiLDqsMmDjevTlBjES01NTUlJUbQ2CK/tVUrVt7egD0/g5hKdxbWxB5uQ6M6ZljvqMxvbXvzhMS8Nj8FFeFlVsh0dSDbQ0HTrkFLWCtwoWp9BCyFuLwFww7PX/Hlm6/3LzRXHCS99paWuxHZ0vjt6PWHOrpi0eUe+Xi9vekymicPlATd8pz5ki/jRDSCMrOJG7/4Jcwth+LKtR/Eqy77Zjg6kWypXgOTNtWCTgvMbG7cAsip9UtFY9gNZBcPWM9Q5fJxUJoexUGWhEDp6ku4cOcHWM4R0wDUXnDuTVTBs3AJdYrLAIMRzYNdTycRRsx0dHo/7p6lJICIcUDoNSLPrq/kUCXnHay4nb5ybtmuudW1fcTEDYCDbxHZ0Jo+OIBQf7ge5dwwZbe8/BAxC+DVXaftrLns34Ia45rKzs8vOnvnWyP4TY8z+caLEfmkt2Y6OdrB1b23CNVdpkUKkdc1lIwBu2l1zPbjcXM7Say62owNXWBPf+xfoyhOB9q1NTKVsLC2SN2r9jQRcc8Vkal9zNVRdfm3CDBjL+Css7X9ARttsRwcCVfW4ASTwjwWblLC0SFp/l6yC4RKdCWfHYBCS1lU0lR2AgSCihW0lQkdPxuHWpqQW/3Nx0ucc+SZcjZNVWcN94bV297lIF3sMtqPDE7jPwr9mkynveGvTacBYu76RZAd5Uy383lmlxD/1elpqFMjHg/wIJbKX9RtsR2f66zGrli5Ys2YN3MOCbLfc1tzahCrIMWSUvf9QMAgpWoVC/JoLf3oQ7mHlv5VAiPCyqmQ7OvKWuoZL38qE+CfSiu6eaalU39okIBAEJYEIG0qVTAzcKHrmKXGYn1miEh2ZXCFTYDRILFMaL4UK0yv8OQr4tR6Hq5S2AD34rc0Ol9miO6dFd8+pM6pSATftrrkIB4eDtc0Dpd6FoFGmUBkvpYpDrRQKJbFTaksq0cl495/xs3fQoKS5XxqvV3J3dFTSvN3rD9YOmbmd0OB3Pg9NzBiSswOUvGD350XnoQQbFJac6e/vhyvAP3LCyjW7ToCgXaOZXxCTpCz65sP9DzuuBS3xs3car9jcL6hVVU2PPHj/YugYxhbOGLbT8jVp0iTDOzHGO2lSppeX5mFkckh6QuiizDgoyRbS8HARpCeGgMAgG0kDdhUcHExWTTMcHR23bNlKrUzbSZejqETnjTfG0aOBA8O7PLAuOyQnJ0OydboF9HFJTwiBRijBBkNbwFPcQD9QeqLuY4FBQUHAonZn02xbW9sMqr9CQ3V3a9redEZRiY7O1JZfhWRHRGjudMKG0xJCIvvhz+hAmZ7QLuJhAR7wegN9QABW/4B2H10MFA4ePBhc7BGr0QkLC4OUk8keFNpXGxcABVpIL1T7+boTVTDStF544uLigELCxZ6SkejY2PDbHnYwvVi9ejWRY0j5yBHqD6eF1xLtX+717e0ELUS3pMgAbaqgEVzQCAYI+PPzw2+8u7m5mb6ntpF5eXkwISPESHSys2d2X0R6INkL5s0B+6W+ruOHhYGhrQkpA14ZiP+vQ2Pig10dNX9QDH2gOjN9EBgvv+SflfUHMEDd3xXMAPMwQoxEh9rIxg4dkvpKv6WTE3lcPdFYNjkxJsQ7LR4/d9ZZF9ph4J+Xzufzif/rQcdv5VU9wTLvEZtl9VV/TEmM8Ne7dD9f908Xj9XrgkYYmJLQ7pY7NLJECB080U4CQ/9FkAGvARc+r1V/I3QwiUQihbsnJqUZBkqkUpjBpNHMHoTQwaa9nf3X78+YlsZT1++FJ6apVCrThjN6FEKH0ekz5+YROuaMPqPXRugwOn3m3Dwb0TFnvK1obYSOFSWT3kNB6NAbbytaDaFjRcmk91AQOvTG24pWQ+hYUTLpPRSEDr3xtqLVEDo9kkw2TIrQYUOWe+QYETo9ElY2TIrQYUOWe+QYETpYVGSEg7uvIDDOBNl6hrwzZWKPZMbiJ0XoYB+sKyjY/JVjWKoJmpi78sMNn9nZtXvi3eKTTs0GETrUxJGFsyB0mJp0s+8boWP2FDB1AwgdpmbO7PtG6Jg9BUzdAEKHqZkz+74ROmZPAVM3gNBhaubMvm+EjtlTYLkbMLwzhI7h+CBvpxFA6HQaGuQwHAGEjuH4IG+nEUDodBoa5DAcAYSO4fggb6cRQOh0GhrkMBwBhI7h+CBvpxGgBJ1OZ0cOK44AQseKk9uzh/Z/AAAA//8MHBr0AAAABklEQVQDAKhfEHKtlDFIAAAAAElFTkSuQmCC",
+        "527": "data:image/png;base64,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"
+      };
+
       function getSignSvg(code) {
         // Стандартные официальные цвета IOF:
         // Коричневый: #b45309 | Черный: #000000 | Синий: #0284c7 | Зеленый: #16a34a / #15803d | Желтый: #facc15 | Фиолетовый: #9333ea
@@ -1422,27 +1468,29 @@
           case "102":
             return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 10 40 25 T 74 25" stroke="#b45309" stroke-width="6" fill="none"/></svg>`;
           case "103":
-            return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 10 40 25 T 74 25" stroke="#b45309" stroke-width="3" stroke-dasharray="6,4" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 10 40 25 T 74 25" stroke="#b45309" stroke-width="2" stroke-dasharray="15,3" fill="none"/></svg>`;
           case "104":
             return `<svg viewBox="0 0 80 50"><path d="M 6 20 Q 40 15 74 20" stroke="#b45309" stroke-width="3.5" fill="none"/><line x1="16" y1="20" x2="16" y2="33" stroke="#b45309" stroke-width="2.5"/><line x1="32" y1="19" x2="32" y2="32" stroke="#b45309" stroke-width="2.5"/><line x1="48" y1="19" x2="48" y2="32" stroke="#b45309" stroke-width="2.5"/><line x1="64" y1="20" x2="64" y2="33" stroke="#b45309" stroke-width="2.5"/></svg>`;
           case "105":
             return `<svg viewBox="0 0 80 50"><line x1="10" y1="25" x2="70" y2="25" stroke="#b45309" stroke-width="3.5"/><circle cx="40" cy="25" r="7" fill="#b45309"/></svg>`;
+          case "106":
+            return `<svg viewBox="0 0 80 50"><line x1="10" y1="25" x2="70" y2="25" stroke="#b45309" stroke-width="2"/><circle cx="18" cy="25" r="2.2" fill="#b45309"/><circle cx="34" cy="25" r="2.2" fill="#b45309"/><circle cx="50" cy="25" r="2.2" fill="#b45309"/><circle cx="66" cy="25" r="2.2" fill="#b45309"/></svg>`;
           case "107":
-            return `<svg viewBox="0 0 80 50"><line x1="10" y1="25" x2="65" y2="25" stroke="#b45309" stroke-width="4.5" stroke-linecap="round"/><polygon points="72,25 60,18 60,32" fill="#b45309"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 12 15 C 24 26 36 23 48 30 C 56 34 62 39 68 43 M 41 27 C 38 18 40 12 45 7" stroke="#b45309" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           case "108":
-            return `<svg viewBox="0 0 80 50"><line x1="10" y1="25" x2="70" y2="25" stroke="#b45309" stroke-width="4" stroke-dasharray="4,6" stroke-linecap="round"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><circle cx="18" cy="25" r="2.8" fill="#b45309"/><circle cx="30" cy="25" r="2.8" fill="#b45309"/><circle cx="42" cy="25" r="2.8" fill="#b45309"/><circle cx="54" cy="25" r="2.8" fill="#b45309"/><circle cx="66" cy="25" r="2.8" fill="#b45309"/></svg>`;
           case "109":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="9" fill="#b45309"/></svg>`;
           case "110":
-            return `<svg viewBox="0 0 80 50"><rect x="18" y="19" width="44" height="12" rx="6" fill="#b45309"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><ellipse cx="40" cy="25" rx="20" ry="7" fill="#b45309"/></svg>`;
           case "111":
-            return `<svg viewBox="0 0 80 50"><path d="M 22 20 A 18 18 0 0 0 58 20" stroke="#b45309" stroke-width="4.5" fill="none" stroke-linecap="round"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 34 21 Q 40 31 46 21" stroke="#b45309" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
           case "112":
-            return `<svg viewBox="0 0 80 50"><polyline points="20,16 40,36 60,16" stroke="#b45309" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polyline points="31,16 40,33 49,16" stroke="#b45309" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           case "113":
-            return `<svg viewBox="0 0 80 50"><circle cx="24" cy="22" r="3.5" fill="#b45309"/><circle cx="40" cy="30" r="3.5" fill="#b45309"/><circle cx="56" cy="20" r="3.5" fill="#b45309"/><circle cx="34" cy="15" r="3" fill="#b45309"/><circle cx="50" cy="33" r="3" fill="#b45309"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><g fill="#b45309"><circle cx="25" cy="18" r="1.8"/><circle cx="31" cy="21" r="1.8"/><circle cx="37" cy="17" r="1.8"/><circle cx="43" cy="22" r="1.8"/><circle cx="49" cy="18" r="1.8"/><circle cx="55" cy="23" r="1.8"/><circle cx="29" cy="28" r="1.8"/><circle cx="36" cy="31" r="1.8"/><circle cx="44" cy="28" r="1.8"/><circle cx="52" cy="32" r="1.8"/></g></svg>`;
           case "115":
-            return `<svg viewBox="0 0 80 50"><polygon points="40,12 58,38 22,38" fill="#b45309"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polygon points="40,14 52,35 28,35" fill="#b45309"/><polygon points="40,21 46,31 34,31" fill="#fff"/></svg>`;
 
           // 4.2 Камни и скалы
           case "201":
@@ -1450,7 +1498,7 @@
           case "202":
             return `<svg viewBox="0 0 80 50"><line x1="8" y1="20" x2="72" y2="20" stroke="#000" stroke-width="3.5"/><line x1="20" y1="20" x2="20" y2="30" stroke="#000" stroke-width="2.5"/><line x1="40" y1="20" x2="40" y2="30" stroke="#000" stroke-width="2.5"/><line x1="60" y1="20" x2="60" y2="30" stroke="#000" stroke-width="2.5"/></svg>`;
           case "203":
-            return `<svg viewBox="0 0 80 50"><polyline points="22,16 40,36 58,16" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polyline points="34,16 40,33 46,16" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           case "204":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="6.5" fill="#000"/></svg>`;
           case "205":
@@ -1460,11 +1508,11 @@
           case "207":
             return `<svg viewBox="0 0 80 50"><polygon points="40,14 54,36 26,36" fill="#000"/></svg>`;
           case "208":
-            return `<svg viewBox="0 0 80 50"><polygon points="20,18 28,31 12,31" fill="#000"/><polygon points="40,14 49,28 31,28" fill="#000"/><polygon points="60,20 68,33 52,33" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polygon points="17,14 23,25 11,25" fill="#000"/><polygon points="36,16 48,22 37,29" fill="#000"/><polygon points="62,13 68,25 56,25" fill="#000"/><polygon points="22,31 33,28 31,39" fill="#000"/><polygon points="51,30 63,35 53,41" fill="#000"/></svg>`;
           case "210":
-            return `<svg viewBox="0 0 80 50"><circle cx="20" cy="20" r="3" fill="#000"/><circle cx="36" cy="16" r="3" fill="#000"/><circle cx="52" cy="22" r="3" fill="#000"/><circle cx="64" cy="30" r="3" fill="#000"/><circle cx="30" cy="32" r="3" fill="#000"/><circle cx="46" cy="34" r="3" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><g fill="#000"><circle cx="17" cy="17" r="1.8"/><circle cx="25" cy="20" r="1.8"/><circle cx="34" cy="16" r="1.8"/><circle cx="43" cy="21" r="1.8"/><circle cx="53" cy="17" r="1.8"/><circle cx="62" cy="22" r="1.8"/><circle cx="20" cy="30" r="1.8"/><circle cx="30" cy="34" r="1.8"/><circle cx="39" cy="28" r="1.8"/><circle cx="49" cy="34" r="1.8"/><circle cx="59" cy="30" r="1.8"/></g></svg>`;
           case "213":
-            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" rx="4" fill="#fef08a"/><circle cx="22" cy="20" r="2.5" fill="#000"/><circle cx="38" cy="18" r="2.5" fill="#000"/><circle cx="55" cy="22" r="2.5" fill="#000"/><circle cx="30" cy="30" r="2.5" fill="#000"/><circle cx="48" cy="32" r="2.5" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" fill="#f9d47a"/><g fill="#000"><circle cx="16" cy="16" r="1.3"/><circle cx="24" cy="17" r="1.3"/><circle cx="32" cy="16" r="1.3"/><circle cx="40" cy="18" r="1.3"/><circle cx="48" cy="16" r="1.3"/><circle cx="56" cy="18" r="1.3"/><circle cx="64" cy="16" r="1.3"/><circle cx="20" cy="24" r="1.3"/><circle cx="28" cy="25" r="1.3"/><circle cx="36" cy="23" r="1.3"/><circle cx="44" cy="25" r="1.3"/><circle cx="52" cy="23" r="1.3"/><circle cx="60" cy="25" r="1.3"/><circle cx="16" cy="33" r="1.3"/><circle cx="25" cy="32" r="1.3"/><circle cx="34" cy="34" r="1.3"/><circle cx="43" cy="32" r="1.3"/><circle cx="52" cy="34" r="1.3"/><circle cx="62" cy="32" r="1.3"/></g></svg>`;
           case "214":
             return `<svg viewBox="0 0 80 50"><rect x="12" y="12" width="56" height="26" rx="4" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/></svg>`;
 
@@ -1474,11 +1522,11 @@
           case "302":
             return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" rx="8" fill="#bae6fd" stroke="#0284c7" stroke-width="2.5"/></svg>`;
           case "303":
-            return `<svg viewBox="0 0 80 50"><polyline points="20,16 40,36 60,16" stroke="#0284c7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polyline points="34,16 40,33 46,16" stroke="#0284c7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           case "305":
             return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 12 40 25 T 74 25" stroke="#0284c7" stroke-width="4" fill="none"/></svg>`;
           case "306":
-            return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 12 40 25 T 74 25" stroke="#0284c7" stroke-width="3.5" stroke-dasharray="6,4" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 6 25 Q 25 12 40 25 T 74 25" stroke="#0284c7" stroke-width="3" stroke-dasharray="15,3" fill="none"/></svg>`;
           case "307":
             return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" rx="4" fill="#e0f2fe" stroke="#000" stroke-width="2.5"/><line x1="14" y1="18" x2="66" y2="18" stroke="#0284c7" stroke-width="3"/><line x1="14" y1="25" x2="66" y2="25" stroke="#0284c7" stroke-width="3"/><line x1="14" y1="32" x2="66" y2="32" stroke="#0284c7" stroke-width="3"/></svg>`;
           case "308":
@@ -1488,51 +1536,51 @@
           case "310":
             return `<svg viewBox="0 0 80 50"><line x1="10" y1="18" x2="70" y2="18" stroke="#0284c7" stroke-width="3" stroke-dasharray="8,5"/><line x1="16" y1="25" x2="64" y2="25" stroke="#0284c7" stroke-width="3" stroke-dasharray="8,5"/><line x1="10" y1="32" x2="70" y2="32" stroke="#0284c7" stroke-width="3" stroke-dasharray="8,5"/></svg>`;
           case "311":
-            return `<svg viewBox="0 0 80 50"><rect x="30" y="15" width="20" height="20" rx="3" fill="#0284c7"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="34" y="19" width="12" height="12" fill="none" stroke="#0284c7" stroke-width="3"/></svg>`;
           case "312":
-            return `<svg viewBox="0 0 80 50"><circle cx="34" cy="25" r="9" stroke="#0284c7" stroke-width="3.5" fill="none"/><line x1="43" y1="25" x2="65" y2="25" stroke="#0284c7" stroke-width="3.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 31 18 Q 31 31 38 31 Q 45 31 45 18 M45 27 Q51 25 55 29 Q59 33 63 28" stroke="#0284c7" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
           case "313":
-            return `<svg viewBox="0 0 80 50"><line x1="40" y1="12" x2="40" y2="38" stroke="#0284c7" stroke-width="3.5"/><line x1="27" y1="25" x2="53" y2="25" stroke="#0284c7" stroke-width="3.5"/><line x1="31" y1="16" x2="49" y2="34" stroke="#0284c7" stroke-width="3.5"/><line x1="49" y1="16" x2="31" y2="34" stroke="#0284c7" stroke-width="3.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M40 14V36 M30 25H50 M32 17L48 33 M48 17L32 33" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round"/></svg>`;
 
           // 4.4 Растительность
           case "401":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#facc15" stroke="#eab308" stroke-width="1.5"/></svg>`;
           case "402":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#facc15"/><circle cx="24" cy="25" r="5" fill="#ffffff" stroke="#15803d" stroke-width="1.5"/><circle cx="56" cy="25" r="5" fill="#ffffff" stroke="#15803d" stroke-width="1.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#facc15"/><g fill="#fff"><circle cx="17" cy="17" r="4"/><circle cx="31" cy="17" r="4"/><circle cx="45" cy="17" r="4"/><circle cx="59" cy="17" r="4"/><circle cx="24" cy="31" r="4"/><circle cx="38" cy="31" r="4"/><circle cx="52" cy="31" r="4"/><circle cx="66" cy="31" r="4"/></g></svg>`;
           case "403":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#fef08a"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#f7dc73"/></svg>`;
           case "404":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#fef08a"/><circle cx="24" cy="25" r="5" fill="#ffffff" stroke="#15803d" stroke-width="1.5"/><circle cx="56" cy="25" r="5" fill="#ffffff" stroke="#15803d" stroke-width="1.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#f7dc73"/><g fill="#fff"><circle cx="17" cy="17" r="4"/><circle cx="31" cy="17" r="4"/><circle cx="45" cy="17" r="4"/><circle cx="59" cy="17" r="4"/><circle cx="24" cy="31" r="4"/><circle cx="38" cy="31" r="4"/><circle cx="52" cy="31" r="4"/><circle cx="66" cy="31" r="4"/></g></svg>`;
           case "405":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/><text x="40" y="28" font-size="10" font-weight="900" fill="#64748b" text-anchor="middle">БЕЛЫЙ ЛЕС</text></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/></svg>`;
           case "406":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#bbf7d0" stroke="#86efac" stroke-width="1"/></svg>`;
           case "407":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/><line x1="20" y1="10" x2="20" y2="40" stroke="#16a34a" stroke-width="4"/><line x1="33" y1="10" x2="33" y2="40" stroke="#16a34a" stroke-width="4"/><line x1="47" y1="10" x2="47" y2="40" stroke="#16a34a" stroke-width="4"/><line x1="60" y1="10" x2="60" y2="40" stroke="#16a34a" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#fff"/><g stroke="#16a34a" stroke-width="2"><line x1="20" y1="10" x2="20" y2="40"/><line x1="33" y1="10" x2="33" y2="40"/><line x1="47" y1="10" x2="47" y2="40"/><line x1="60" y1="10" x2="60" y2="40"/></g></svg>`;
           case "408":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#4ade80"/></svg>`;
           case "409":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/><line x1="16" y1="10" x2="16" y2="40" stroke="#15803d" stroke-width="4.5"/><line x1="28" y1="10" x2="28" y2="40" stroke="#15803d" stroke-width="4.5"/><line x1="40" y1="10" x2="40" y2="40" stroke="#15803d" stroke-width="4.5"/><line x1="52" y1="10" x2="52" y2="40" stroke="#15803d" stroke-width="4.5"/><line x1="64" y1="10" x2="64" y2="40" stroke="#15803d" stroke-width="4.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#fff"/><g stroke="#15803d" stroke-width="2"><line x1="13" y1="10" x2="13" y2="40"/><line x1="21" y1="10" x2="21" y2="40"/><line x1="29" y1="10" x2="29" y2="40"/><line x1="37" y1="10" x2="37" y2="40"/><line x1="45" y1="10" x2="45" y2="40"/><line x1="53" y1="10" x2="53" y2="40"/><line x1="61" y1="10" x2="61" y2="40"/><line x1="69" y1="10" x2="69" y2="40"/></g></svg>`;
           case "410":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#15803d"/></svg>`;
           case "411":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#14532d" stroke="#052e16" stroke-width="1.5"/></svg>`;
           case "412":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#facc15" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#facc15"/><g fill="#000"><circle cx="17" cy="16" r="1.4"/><circle cx="26" cy="16" r="1.4"/><circle cx="35" cy="16" r="1.4"/><circle cx="44" cy="16" r="1.4"/><circle cx="53" cy="16" r="1.4"/><circle cx="62" cy="16" r="1.4"/><circle cx="17" cy="25" r="1.4"/><circle cx="26" cy="25" r="1.4"/><circle cx="35" cy="25" r="1.4"/><circle cx="44" cy="25" r="1.4"/><circle cx="53" cy="25" r="1.4"/><circle cx="62" cy="25" r="1.4"/><circle cx="17" cy="34" r="1.4"/><circle cx="26" cy="34" r="1.4"/><circle cx="35" cy="34" r="1.4"/><circle cx="44" cy="34" r="1.4"/><circle cx="53" cy="34" r="1.4"/><circle cx="62" cy="34" r="1.4"/></g></svg>`;
           case "413":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#facc15"/><circle cx="20" cy="18" r="2.5" fill="#15803d"/><circle cx="40" cy="18" r="2.5" fill="#15803d"/><circle cx="60" cy="18" r="2.5" fill="#15803d"/><circle cx="20" cy="32" r="2.5" fill="#15803d"/><circle cx="40" cy="32" r="2.5" fill="#15803d"/><circle cx="60" cy="32" r="2.5" fill="#15803d"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#facc15"/><g fill="#15803d"><circle cx="20" cy="18" r="3.5"/><circle cx="40" cy="18" r="3.5"/><circle cx="60" cy="18" r="3.5"/><circle cx="20" cy="32" r="3.5"/><circle cx="40" cy="32" r="3.5"/><circle cx="60" cy="32" r="3.5"/></g></svg>`;
           case "414":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#facc15"/><line x1="12" y1="20" x2="68" y2="20" stroke="#15803d" stroke-width="2.5" stroke-dasharray="5,3"/><line x1="12" y1="30" x2="68" y2="30" stroke="#15803d" stroke-width="2.5" stroke-dasharray="5,3"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#facc15"/><line x1="12" y1="19" x2="68" y2="19" stroke="#15803d" stroke-width="2" stroke-dasharray="12,7"/><line x1="12" y1="31" x2="68" y2="31" stroke="#15803d" stroke-width="2" stroke-dasharray="12,7"/></svg>`;
           case "415":
             return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5"/></svg>`;
           case "416":
             return `<svg viewBox="0 0 80 50"><circle cx="12" cy="25" r="2.5" fill="#000"/><circle cx="23" cy="25" r="2.5" fill="#000"/><circle cx="34" cy="25" r="2.5" fill="#000"/><circle cx="45" cy="25" r="2.5" fill="#000"/><circle cx="56" cy="25" r="2.5" fill="#000"/><circle cx="67" cy="25" r="2.5" fill="#000"/></svg>`;
           case "417":
-            return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="11" fill="#16a34a" stroke="#ffffff" stroke-width="2.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="12" fill="#16a34a"/><circle cx="40" cy="25" r="5" fill="#fff"/></svg>`;
           case "418":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="8" fill="#16a34a"/><circle cx="40" cy="25" r="2.5" fill="#ffffff"/></svg>`;
           case "419":
-            return `<svg viewBox="0 0 80 50"><line x1="40" y1="12" x2="40" y2="38" stroke="#16a34a" stroke-width="4"/><line x1="27" y1="25" x2="53" y2="25" stroke="#16a34a" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="29" y1="14" x2="51" y2="36" stroke="#16a34a" stroke-width="4"/><line x1="51" y1="14" x2="29" y2="36" stroke="#16a34a" stroke-width="4"/></svg>`;
 
           // 4.5 Искусственные объекты
           case "501":
@@ -1540,49 +1588,49 @@
           case "501.1":
             return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#d97706" opacity="0.3"/><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5"/></svg>`;
           case "501.2":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#d97706" opacity="0.3"/><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5" stroke-dasharray="5,4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#d97706" opacity="0.3"/><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="1.5" stroke-dasharray="10,5"/></svg>`;
           case "501.3":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#d97706" opacity="0.35"/><circle cx="25" cy="25" r="4.5" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/><circle cx="55" cy="25" r="4.5" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#d97706" opacity="0.35"/><g fill="#fff"><circle cx="17" cy="17" r="4"/><circle cx="31" cy="17" r="4"/><circle cx="45" cy="17" r="4"/><circle cx="59" cy="17" r="4"/><circle cx="24" cy="31" r="4"/><circle cx="38" cy="31" r="4"/><circle cx="52" cy="31" r="4"/><circle cx="66" cy="31" r="4"/></g></svg>`;
           case "505":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#78350f" stroke-width="4.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="20" width="64" height="10" fill="#d6a56a"/><line x1="8" y1="20" x2="72" y2="20" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/><line x1="8" y1="30" x2="72" y2="30" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/></svg>`;
           case "506":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5" stroke-dasharray="6,4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5" stroke-dasharray="11,4"/></svg>`;
           case "507":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="22" x2="72" y2="22" stroke="#000" stroke-width="2" stroke-dasharray="6,6"/><line x1="8" y1="28" x2="72" y2="28" stroke="#000" stroke-width="2" stroke-dasharray="6,6"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2" stroke-dasharray="7,3,7,16"/></svg>`;
           case "508":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#4ade80" opacity="0.4"/><rect x="8" y="20" width="64" height="10" fill="#ffffff"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2" stroke-dasharray="16,4"/></svg>`;
           case "509.1":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="2.5"/><line x1="15" y1="16" x2="15" y2="34" stroke="#000" stroke-width="3"/><line x1="28" y1="16" x2="28" y2="34" stroke="#000" stroke-width="3"/><line x1="41" y1="16" x2="41" y2="34" stroke="#000" stroke-width="3"/><line x1="54" y1="16" x2="54" y2="34" stroke="#000" stroke-width="3"/><line x1="67" y1="16" x2="67" y2="34" stroke="#000" stroke-width="3"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="20" x2="74" y2="20" stroke="#64748b" stroke-width="1.5"/><line x1="6" y1="30" x2="74" y2="30" stroke="#64748b" stroke-width="1.5"/><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="4"/><line x1="13" y1="25" x2="67" y2="25" stroke="#fff" stroke-width="2" stroke-dasharray="8,7"/></svg>`;
           case "509.2":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#64748b" stroke-width="4.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="20" x2="72" y2="20" stroke="#64748b" stroke-width="1.5"/><line x1="8" y1="30" x2="72" y2="30" stroke="#64748b" stroke-width="1.5"/></svg>`;
           case "510":
             return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="1.8"/><line x1="24" y1="18" x2="24" y2="32" stroke="#000" stroke-width="2.5"/><line x1="56" y1="18" x2="56" y2="32" stroke="#000" stroke-width="2.5"/></svg>`;
           case "511":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="20" x2="74" y2="20" stroke="#000" stroke-width="2"/><line x1="6" y1="30" x2="74" y2="30" stroke="#000" stroke-width="2"/><line x1="40" y1="12" x2="40" y2="38" stroke="#000" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="40" y1="10" x2="40" y2="40" stroke="#000" stroke-width="1.5"/><line x1="6" y1="20" x2="74" y2="20" stroke="#000" stroke-width="1.5"/><line x1="6" y1="30" x2="74" y2="30" stroke="#000" stroke-width="1.5"/><rect x="37" y="22" width="6" height="6" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>`;
           case "512.1":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="14" x2="72" y2="14" stroke="#000" stroke-width="4"/><line x1="8" y1="36" x2="72" y2="36" stroke="#000" stroke-width="4"/><polygon points="26,14 40,24 12,24" fill="#000"/><polygon points="26,36 40,26 12,26" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><image href="${REFERENCE_SYMBOL_IMAGES["512.1"]}" x="0" y="0" width="80" height="50" preserveAspectRatio="xMidYMid meet"/></svg>`;
           case "512.2":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="18" x2="72" y2="18" stroke="#000" stroke-width="2.5" stroke-dasharray="6,4"/><line x1="8" y1="32" x2="72" y2="32" stroke="#000" stroke-width="2.5" stroke-dasharray="6,4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polygon points="8,19 15,15 15,23" fill="#000"/><polygon points="8,25 15,21 15,29" fill="#000"/><polygon points="8,31 15,27 15,35" fill="#000"/><g fill="#000"><rect x="16" y="17" width="3" height="3"/><rect x="22" y="17" width="3" height="3"/><rect x="28" y="17" width="3" height="3"/><rect x="34" y="13" width="3" height="3"/><rect x="40" y="9" width="3" height="3"/><rect x="46" y="5" width="3" height="3"/><rect x="52" y="5" width="3" height="3"/><rect x="60" y="5" width="3" height="3"/><rect x="68" y="5" width="3" height="3"/><rect x="16" y="24" width="3" height="3"/><rect x="22" y="24" width="3" height="3"/><rect x="28" y="24" width="3" height="3"/><rect x="34" y="24" width="3" height="3"/><rect x="40" y="24" width="3" height="3"/><rect x="46" y="24" width="3" height="3"/><rect x="54" y="24" width="3" height="3"/><rect x="62" y="24" width="3" height="3"/><rect x="70" y="24" width="3" height="3"/><rect x="16" y="31" width="3" height="3"/><rect x="22" y="31" width="3" height="3"/><rect x="28" y="31" width="3" height="3"/><rect x="34" y="31" width="3" height="3"/><rect x="40" y="31" width="3" height="3"/><rect x="48" y="31" width="3" height="3"/><rect x="56" y="31" width="3" height="3"/><rect x="64" y="31" width="3" height="3"/><rect x="72" y="31" width="3" height="3"/></g></svg>`;
           case "512.3":
-            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" fill="#64748b"/><line x1="15" y1="40" x2="45" y2="10" stroke="#ffffff" stroke-width="4"/><line x1="35" y1="40" x2="65" y2="10" stroke="#ffffff" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" fill="#d97706" opacity=".45"/><line x1="5" y1="40" x2="35" y2="10" stroke="#fff" stroke-width="5"/><line x1="25" y1="40" x2="55" y2="10" stroke="#fff" stroke-width="5"/><line x1="45" y1="40" x2="75" y2="10" stroke="#fff" stroke-width="5"/></svg>`;
           case "513.1":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5"/><circle cx="20" cy="25" r="4" fill="#000"/><circle cx="40" cy="25" r="4" fill="#000"/><circle cx="60" cy="25" r="4" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2.5"/><circle cx="17" cy="25" r="3.5" fill="#000"/><circle cx="40" cy="25" r="3.5" fill="#000"/><circle cx="63" cy="25" r="3.5" fill="#000"/></svg>`;
           case "513.2":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="3"/><circle cx="20" cy="32" r="3" fill="#000"/><circle cx="40" cy="32" r="3" fill="#000"/><circle cx="60" cy="32" r="3" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="20" x2="72" y2="20" stroke="#000" stroke-width="3"/><path d="M 15 20 A 5 5 0 0 0 25 20 Z M 35 20 A 5 5 0 0 0 45 20 Z M 55 20 A 5 5 0 0 0 65 20 Z" fill="#000"/></svg>`;
           case "515":
             return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="8"/></svg>`;
           case "516":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="2.5"/><line x1="18" y1="17" x2="18" y2="33" stroke="#000" stroke-width="2"/><line x1="32" y1="17" x2="32" y2="33" stroke="#000" stroke-width="2"/><line x1="48" y1="17" x2="48" y2="33" stroke="#000" stroke-width="2"/><line x1="62" y1="17" x2="62" y2="33" stroke="#000" stroke-width="2"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="22" x2="74" y2="22" stroke="#000" stroke-width="2.5"/><line x1="17" y1="22" x2="22" y2="31" stroke="#000" stroke-width="2"/><line x1="41" y1="22" x2="46" y2="31" stroke="#000" stroke-width="2"/><line x1="65" y1="22" x2="70" y2="31" stroke="#000" stroke-width="2"/></svg>`;
           case "518":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="5"/><line x1="18" y1="15" x2="18" y2="35" stroke="#000" stroke-width="2.5"/><line x1="22" y1="15" x2="22" y2="35" stroke="#000" stroke-width="2.5"/><line x1="42" y1="15" x2="42" y2="35" stroke="#000" stroke-width="2.5"/><line x1="46" y1="15" x2="46" y2="35" stroke="#000" stroke-width="2.5"/><line x1="66" y1="15" x2="66" y2="35" stroke="#000" stroke-width="2.5"/><line x1="70" y1="15" x2="70" y2="35" stroke="#000" stroke-width="2.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="22" x2="74" y2="22" stroke="#000" stroke-width="5"/><line x1="20" y1="22" x2="26" y2="33" stroke="#000" stroke-width="2.5"/><line x1="26" y1="22" x2="32" y2="33" stroke="#000" stroke-width="2.5"/><line x1="54" y1="22" x2="60" y2="33" stroke="#000" stroke-width="2.5"/><line x1="60" y1="22" x2="66" y2="33" stroke="#000" stroke-width="2.5"/></svg>`;
           case "519":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="30" y2="25" stroke="#000" stroke-width="4"/><line x1="50" y1="25" x2="74" y2="25" stroke="#000" stroke-width="4"/><path d="M 33 16 Q 40 21 33 26" stroke="#000" stroke-width="3" fill="none"/><path d="M 47 24 Q 40 29 47 34" stroke="#000" stroke-width="3" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="34" y2="25" stroke="#000" stroke-width="3.5"/><line x1="46" y1="25" x2="74" y2="25" stroke="#000" stroke-width="3.5"/><line x1="35" y1="17" x2="35" y2="33" stroke="#000" stroke-width="2.5"/><line x1="45" y1="17" x2="45" y2="33" stroke="#000" stroke-width="2.5"/></svg>`;
           case "520":
-            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" rx="4" fill="#a1a1aa" opacity="0.3"/><line x1="10" y1="40" x2="40" y2="10" stroke="#84cc16" stroke-width="3.5"/><line x1="26" y1="40" x2="56" y2="10" stroke="#84cc16" stroke-width="3.5"/><line x1="42" y1="40" x2="72" y2="10" stroke="#84cc16" stroke-width="3.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="8" y="10" width="64" height="30" fill="#a2ad00"/></svg>`;
           case "521":
-            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#475569" stroke="#000" stroke-width="3.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#475569" stroke="#000" stroke-width="1.5"/></svg>`;
           case "522":
-            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/><rect x="16" y="14" width="4" height="4" fill="#000"/><rect x="60" y="14" width="4" height="4" fill="#000"/><rect x="16" y="32" width="4" height="4" fill="#000"/><rect x="60" y="32" width="4" height="4" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#cbd5e1" stroke="#000" stroke-width="1.5"/></svg>`;
           case "522.1":
             return `<svg viewBox="0 0 80 50"><rect x="34" y="19" width="12" height="12" fill="#000"/></svg>`;
           case "524":
@@ -1592,47 +1640,47 @@
           case "526":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="10" stroke="#000" stroke-width="3" fill="none"/><circle cx="40" cy="25" r="3" fill="#000"/></svg>`;
           case "527":
-            return `<svg viewBox="0 0 80 50"><polyline points="28,28 40,16 52,28" stroke="#000" stroke-width="4" stroke-linecap="round" fill="none"/><line x1="40" y1="18" x2="40" y2="38" stroke="#000" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><image href="${REFERENCE_SYMBOL_IMAGES["527"]}" x="0" y="0" width="80" height="50" preserveAspectRatio="xMidYMid meet"/></svg>`;
           case "528":
-            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2"/><polygon points="26,21 34,25 26,29" fill="#000"/><polygon points="54,21 62,25 54,29" fill="#000"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#000" stroke-width="2"/><path d="M 22 20 L 30 25 L 22 30 M 48 20 L 56 25 L 48 30" stroke="#000" stroke-width="2" fill="none"/></svg>`;
           case "529":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="5"/><polyline points="22,17 32,25 22,33" stroke="#000" stroke-width="3" fill="none"/><polyline points="52,17 62,25 52,33" stroke="#000" stroke-width="3" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#000" stroke-width="5"/><path d="M 18 18 L 27 25 L 18 32 M 27 18 L 36 25 L 27 32 M 49 18 L 58 25 L 49 32 M 58 18 L 67 25 L 58 32" stroke="#000" stroke-width="2.5" fill="none"/></svg>`;
           case "530":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="11" stroke="#000" stroke-width="4" fill="none"/></svg>`;
           case "531":
             return `<svg viewBox="0 0 80 50"><line x1="26" y1="13" x2="54" y2="37" stroke="#000" stroke-width="5"/><line x1="54" y1="13" x2="26" y2="37" stroke="#000" stroke-width="5"/></svg>`;
           case "532":
-            return `<svg viewBox="0 0 80 50"><line x1="15" y1="12" x2="15" y2="38" stroke="#000" stroke-width="2.5"/><line x1="65" y1="12" x2="65" y2="38" stroke="#000" stroke-width="2.5"/><line x1="15" y1="17" x2="65" y2="17" stroke="#000" stroke-width="2.5"/><line x1="15" y1="25" x2="65" y2="25" stroke="#000" stroke-width="2.5"/><line x1="15" y1="33" x2="65" y2="33" stroke="#000" stroke-width="2.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="30" y="10" width="20" height="30" fill="none" stroke="#000" stroke-width="1.5"/><line x1="30" y1="16" x2="50" y2="16" stroke="#000" stroke-width="1.5"/><line x1="30" y1="22" x2="50" y2="22" stroke="#000" stroke-width="1.5"/><line x1="30" y1="28" x2="50" y2="28" stroke="#000" stroke-width="1.5"/><line x1="30" y1="34" x2="50" y2="34" stroke="#000" stroke-width="1.5"/></svg>`;
 
           // 4.6 Технические
           case "601":
-            return `<svg viewBox="0 0 80 50"><line x1="40" y1="38" x2="40" y2="14" stroke="#0284c7" stroke-width="2.5"/><polygon points="40,8 35,16 45,16" fill="#0284c7"/><text x="40" y="32" font-size="12" font-weight="900" fill="#0284c7" text-anchor="middle">N</text></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="40" y1="7" x2="40" y2="43" stroke="#0284c7" stroke-width="2.5"/></svg>`;
 
           // 4.7 Знаки трассы
           case "701":
-            return `<svg viewBox="0 0 80 50"><polygon points="40,11 60,39 20,39" stroke="#9333ea" stroke-width="4.5" fill="none" stroke-linejoin="round"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><polygon points="40,10 57.3,40 22.7,40" stroke="#9333ea" stroke-width="4" fill="none" stroke-linejoin="round"/></svg>`;
           case "702":
-            return `<svg viewBox="0 0 80 50"><polygon points="40,14 56,38 24,38" stroke="#9333ea" stroke-width="3" fill="none"/><line x1="20" y1="26" x2="60" y2="26" stroke="#9333ea" stroke-width="4"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="40" y1="12" x2="40" y2="38" stroke="#9333ea" stroke-width="4"/></svg>`;
           case "703":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="14" stroke="#9333ea" stroke-width="4.5" fill="none"/></svg>`;
           case "704":
             return `<svg viewBox="0 0 80 50"><circle cx="28" cy="25" r="11" stroke="#9333ea" stroke-width="2.5" fill="none"/><text x="56" y="31" font-size="20" font-weight="900" fill="#9333ea" text-anchor="middle">31</text></svg>`;
           case "705":
-            return `<svg viewBox="0 0 80 50"><circle cx="20" cy="25" r="8" stroke="#9333ea" stroke-width="3" fill="none"/><circle cx="60" cy="25" r="8" stroke="#9333ea" stroke-width="3" fill="none"/><line x1="28" y1="25" x2="52" y2="25" stroke="#9333ea" stroke-width="3.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#9333ea" stroke-width="3.5"/></svg>`;
           case "706":
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="15" stroke="#9333ea" stroke-width="3.5" fill="none"/><circle cx="40" cy="25" r="9" stroke="#9333ea" stroke-width="3.5" fill="none"/></svg>`;
           case "707":
-            return `<svg viewBox="0 0 80 50"><path d="M 8 25 Q 25 15 40 25 T 72 25" stroke="#9333ea" stroke-width="4" stroke-dasharray="6,5" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="8" y1="25" x2="72" y2="25" stroke="#9333ea" stroke-width="3" stroke-dasharray="13,5"/></svg>`;
           case "708":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#9333ea" stroke-width="3.5"/><line x1="16" y1="18" x2="26" y2="32" stroke="#9333ea" stroke-width="3"/><line x1="26" y1="18" x2="16" y2="32" stroke="#9333ea" stroke-width="3"/><line x1="46" y1="18" x2="56" y2="32" stroke="#9333ea" stroke-width="3"/><line x1="56" y1="18" x2="46" y2="32" stroke="#9333ea" stroke-width="3"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="74" y2="25" stroke="#9333ea" stroke-width="4"/></svg>`;
           case "709":
-            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" fill="none" stroke="#9333ea" stroke-width="2"/><line x1="12" y1="40" x2="42" y2="10" stroke="#9333ea" stroke-width="3"/><line x1="28" y1="40" x2="58" y2="10" stroke="#9333ea" stroke-width="3"/><line x1="44" y1="40" x2="74" y2="10" stroke="#9333ea" stroke-width="3"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="10" y="10" width="60" height="30" fill="none" stroke="#9333ea" stroke-width="1.2"/><g stroke="#9333ea" stroke-width="1.2"><line x1="10" y1="36" x2="36" y2="10"/><line x1="20" y1="40" x2="50" y2="10"/><line x1="34" y1="40" x2="64" y2="10"/><line x1="48" y1="40" x2="70" y2="18"/><line x1="10" y1="14" x2="36" y2="40"/><line x1="24" y1="10" x2="54" y2="40"/><line x1="40" y1="10" x2="70" y2="40"/></g></svg>`;
           case "710.1":
-            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="26" y2="25" stroke="#000" stroke-width="3.5"/><line x1="54" y1="25" x2="74" y2="25" stroke="#000" stroke-width="3.5"/><path d="M 30 16 Q 40 21 30 26" stroke="#9333ea" stroke-width="3.5" fill="none"/><path d="M 50 24 Q 40 29 50 34" stroke="#9333ea" stroke-width="3.5" fill="none"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><line x1="6" y1="25" x2="20" y2="25" stroke="#000" stroke-width="3"/><line x1="60" y1="25" x2="74" y2="25" stroke="#000" stroke-width="3"/><path d="M 28 12 Q 36 25 28 38" stroke="#9333ea" stroke-width="3" fill="none"/><path d="M 52 12 Q 44 25 52 38" stroke="#9333ea" stroke-width="3" fill="none"/></svg>`;
           case "710.2":
-            return `<svg viewBox="0 0 80 50"><line x1="10" y1="16" x2="70" y2="16" stroke="#9333ea" stroke-width="3"/><line x1="10" y1="34" x2="70" y2="34" stroke="#9333ea" stroke-width="3"/><line x1="22" y1="16" x2="34" y2="34" stroke="#9333ea" stroke-width="2.5"/><line x1="42" y1="16" x2="54" y2="34" stroke="#9333ea" stroke-width="2.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><path d="M 14 31 Q 19 34 25 31 L 52 15 Q 57 12 58 7" stroke="#b832a2" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M 25 42 Q 25 37 31 34 L 60 17 Q 65 14 68 20" stroke="#b832a2" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
           case "714":
-            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#f3e8ff" stroke="#9333ea" stroke-width="3"/><line x1="16" y1="36" x2="40" y2="12" stroke="#9333ea" stroke-width="2.5"/><line x1="36" y1="36" x2="60" y2="12" stroke="#9333ea" stroke-width="2.5"/></svg>`;
+            return `<svg viewBox="0 0 80 50"><rect x="12" y="10" width="56" height="30" fill="#d3a4cc" stroke="#9333ea" stroke-width="1.5"/></svg>`;
 
           default:
             return `<svg viewBox="0 0 80 50"><circle cx="40" cy="25" r="14" fill="#f97316"/><text x="40" y="29" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">IOF</text></svg>`;
@@ -1650,8 +1698,10 @@
 
       // Текущие настройки
       let gameMode = "teams"; // "teams" | "solo"
-      let difficulty = "medium"; // "hard" | "medium" | "easy"
+      let mapStandard = "sprint"; // "sprint" | "forest"
+      let difficulty = "medium"; // "ultrahard" | "hard" | "medium" | "easy"
       let numTeams = 2;
+      let playersPerTeam = 4;
       let teams = [
         { name: "Азимут", color: "#f97316", score: 0, players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"], nextPlayerIdx: 0 },
         { name: "Призма", color: "#10b981", score: 0, players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"], nextPlayerIdx: 0 }
@@ -1669,6 +1719,8 @@
       let timeLeft = 60;
       let roundGuessed = [];
       let roundSkipped = [];
+      let roundScoring = [];
+      let roundScoresBefore = [];
       let activeResultTab = "guessed";
       let isPaused = false;
       let soundEnabled = true;
@@ -1768,6 +1820,7 @@
       const discardGameBtn = document.getElementById('discardGameBtn');
 
       const diffDesc = document.getElementById('diffDesc');
+      const standardDesc = document.getElementById('standardDesc');
       const teamsConfigBlock = document.getElementById('teamsConfigBlock');
       const teamsBuilder = document.getElementById('teamsBuilder');
       const goalConfigBlock = document.getElementById('goalConfigBlock');
@@ -1841,11 +1894,15 @@
               name: DEFAULT_TEAM_NAMES[i] || `Команда ${i + 1}`,
               color: TEAM_COLORS[i % TEAM_COLORS.length],
               score: 0,
-              players: ["Игрок 1", "Игрок 2", "Игрок 3", "Игрок 4"],
+              players: [],
               nextPlayerIdx: 0
             };
           }
           const t = teams[i];
+          if (!Array.isArray(t.players)) t.players = [];
+          t.players = t.players.slice(0, playersPerTeam);
+          while (t.players.length < playersPerTeam) t.players.push(`Игрок ${t.players.length + 1}`);
+          if (t.nextPlayerIdx >= t.players.length) t.nextPlayerIdx = 0;
           const card = document.createElement('div');
           card.className = 'team-config-card';
           card.style.borderLeftColor = t.color;
@@ -1854,7 +1911,7 @@
               <span style="width: 10px; height: 10px; border-radius: 50%; background: ${t.color}; flex-shrink: 0;"></span>
               <input type="text" class="team-name-input" data-team-idx="${i}" value="${escapeHtml(t.name)}" placeholder="Название команды ${i + 1}" />
             </div>
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Игроки команды (до 4 чел):</div>
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Игроки команды (${playersPerTeam} чел.):</div>
             <div class="players-grid">
               ${t.players.map((p, pIdx) => `
                 <input type="text" class="player-input" data-team-idx="${i}" data-player-idx="${pIdx}" value="${escapeHtml(p)}" placeholder="Игрок ${pIdx + 1}" />
@@ -1884,13 +1941,19 @@
       }
 
       function updateDifficultyDescription() {
-        if (difficulty === 'hard') {
+        const standardName = getStandardTitle(mapStandard);
+        if (difficulty === 'ultrahard') {
+          diffDesc.textContent = "Ультрахард: Только рисунок знака — без названия и подсказки.";
+        } else if (difficulty === 'hard') {
           diffDesc.textContent = "Хард: Только название знака. Для профи и опытных ориентировщиков.";
         } else if (difficulty === 'medium') {
-          diffDesc.textContent = "Средний: Название + рисунок знака карты IOF ISSprOM.";
+          diffDesc.textContent = `Средний: Название + рисунок знака карты ${standardName}.`;
         } else {
           diffDesc.textContent = "Легкий: Рисунок знака + название + сленг и подсказки как объяснить!";
         }
+        standardDesc.textContent = mapStandard === 'forest'
+          ? 'Лесные знаки ISOM. Спринтовые знаки ISSprOM в колоду не попадут.'
+          : 'Спринтовые знаки ISSprOM. Лесные знаки ISOM в колоду не попадут.';
       }
 
       function setupSettingsEvents() {
@@ -1902,6 +1965,16 @@
             gameMode = btn.dataset.mode;
             teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
             goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+            saveConfig();
+          });
+        });
+
+        document.querySelectorAll('[data-standard]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-standard]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            mapStandard = btn.dataset.standard;
+            updateDifficultyDescription();
             saveConfig();
           });
         });
@@ -1923,6 +1996,16 @@
             document.querySelectorAll('[data-teams]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             numTeams = parseInt(btn.dataset.teams, 10);
+            renderTeamsBuilder();
+            saveConfig();
+          });
+        });
+
+        document.querySelectorAll('[data-players]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-players]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            playersPerTeam = parseInt(btn.dataset.players, 10);
             renderTeamsBuilder();
             saveConfig();
           });
@@ -1967,7 +2050,7 @@
 
       function saveConfig() {
         try {
-          const config = { gameMode, difficulty, numTeams, teams, goalType, goalValue, roundDuration };
+          const config = { gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration };
           localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
         } catch (e) {}
       }
@@ -1978,8 +2061,10 @@
           if (saved) {
             const c = JSON.parse(saved);
             if (c.gameMode) gameMode = c.gameMode;
+            if (c.mapStandard === 'sprint' || c.mapStandard === 'forest') mapStandard = c.mapStandard;
             if (c.difficulty) difficulty = c.difficulty;
             if (c.numTeams) numTeams = c.numTeams;
+            if (c.playersPerTeam >= 2 && c.playersPerTeam <= 6) playersPerTeam = c.playersPerTeam;
             if (c.teams && Array.isArray(c.teams)) teams = c.teams;
             if (c.goalType) goalType = c.goalType;
             if (c.goalValue) goalValue = c.goalValue;
@@ -1992,10 +2077,12 @@
         teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
         goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
 
+        document.querySelectorAll('[data-standard]').forEach(b => b.classList.toggle('active', b.dataset.standard === mapStandard));
         document.querySelectorAll('[data-diff]').forEach(b => b.classList.toggle('active', b.dataset.diff === difficulty));
         updateDifficultyDescription();
 
         document.querySelectorAll('[data-teams]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.teams, 10) === numTeams));
+        document.querySelectorAll('[data-players]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.players, 10) === playersPerTeam));
         document.querySelectorAll('[data-goal]').forEach(b => b.classList.toggle('active', b.dataset.goal === goalType && parseInt(b.dataset.val, 10) === goalValue));
         document.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.time, 10) === roundDuration));
 
@@ -2017,9 +2104,9 @@
       function saveActiveMatchState() {
         try {
           const state = {
-            gameMode, difficulty, numTeams, teams, goalType, goalValue, roundDuration,
+            gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration,
             currentRoundNumber, currentTeamTurnIndex,
-            deck, cardIdx
+            deck, cardIdx, roundGuessed, roundSkipped, roundScoring, roundScoresBefore
           };
           localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(state));
         } catch (e) {}
@@ -2031,16 +2118,22 @@
           if (!raw) return;
           const s = JSON.parse(raw);
           gameMode = s.gameMode;
+          mapStandard = s.mapStandard === 'forest' ? 'forest' : 'sprint';
           if (s.difficulty) difficulty = s.difficulty;
           numTeams = s.numTeams;
+          if (s.playersPerTeam >= 2 && s.playersPerTeam <= 6) playersPerTeam = s.playersPerTeam;
           teams = s.teams;
           goalType = s.goalType;
           goalValue = s.goalValue;
           roundDuration = s.roundDuration;
           currentRoundNumber = s.currentRoundNumber || 1;
           currentTeamTurnIndex = s.currentTeamTurnIndex || 0;
-          deck = s.deck && s.deck.length ? s.deck : shuffleArray(orienteeringWords);
+          deck = s.deck && s.deck.length && s.mapStandard ? s.deck : shuffleArray(getWordsForStandard(mapStandard));
           cardIdx = s.cardIdx || 0;
+          roundGuessed = s.roundGuessed || [];
+          roundSkipped = s.roundSkipped || [];
+          roundScoring = s.roundScoring || [];
+          roundScoresBefore = s.roundScoresBefore || [];
 
           prepareTurnHandover();
         } catch (e) {
@@ -2058,8 +2151,10 @@
         });
         currentRoundNumber = 1;
         currentTeamTurnIndex = 0;
-        deck = shuffleArray(orienteeringWords);
+        deck = shuffleArray(getWordsForStandard(mapStandard));
         cardIdx = 0;
+        roundScoring = [];
+        roundScoresBefore = [];
 
         saveActiveMatchState();
 
@@ -2112,6 +2207,8 @@
 
         roundGuessed = [];
         roundSkipped = [];
+        roundScoring = [];
+        roundScoresBefore = [];
         timeLeft = roundDuration;
         isPaused = false;
 
@@ -2131,7 +2228,7 @@
 
       function renderCurrentCard() {
         if (cardIdx >= deck.length) {
-          deck = shuffleArray(orienteeringWords);
+          deck = shuffleArray(getWordsForStandard(mapStandard));
           cardIdx = 0;
         }
 
@@ -2139,19 +2236,31 @@
         cardWord.textContent = card.word;
 
         // Настройка отображения в зависимости от сложности
-        if (difficulty === 'hard') {
+        if (difficulty === 'ultrahard') {
+          cardVisualWrap.style.display = 'flex';
+          cardSvgBadge.innerHTML = getSignSvg(card.code);
+          cardSignCode.style.display = 'none';
+          cardWord.style.display = 'none';
+          cardEasyClue.style.display = 'none';
+        } else if (difficulty === 'hard') {
           // Хард: только слово
           cardVisualWrap.style.display = 'none';
+          cardSignCode.style.display = '';
+          cardWord.style.display = '';
           cardEasyClue.style.display = 'none';
         } else if (difficulty === 'medium') {
           // Средний: рисунок знака + слово
           cardVisualWrap.style.display = 'flex';
+          cardWord.style.display = '';
+          cardSignCode.style.display = '';
           cardSvgBadge.innerHTML = getSignSvg(card.code);
           cardSignCode.textContent = `Знак ${card.code}`;
           cardEasyClue.style.display = 'none';
         } else {
           // Легкий: рисунок + слово + сленг и подсказка как объяснить
           cardVisualWrap.style.display = 'flex';
+          cardWord.style.display = '';
+          cardSignCode.style.display = '';
           cardSvgBadge.innerHTML = getSignSvg(card.code);
           cardSignCode.textContent = `Знак ${card.code}`;
           cardEasyClue.style.display = 'block';
@@ -2274,15 +2383,18 @@
       function finishCurrentTurn() {
         playSound('buzzer');
 
-        const pointsGained = roundGuessed.length;
         const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : teams[0];
-        team.score += pointsGained;
+        roundScoresBefore = teams.map(t => t.score);
+        roundScoring = [
+          ...roundGuessed.map((card, sourceIndex) => ({ card, source: 'guessed', sourceIndex, awardedTo: currentTeamTurnIndex })),
+          ...roundSkipped.map((card, sourceIndex) => ({ card, source: 'skipped', sourceIndex, awardedTo: null }))
+        ];
+        applyRoundScoring();
         team.nextPlayerIdx = (team.nextPlayerIdx + 1) % team.players.length;
 
         // Отображение итогов хода
         roundResultTeamTitle.textContent = team.name;
         roundResultTeamTitle.style.color = team.color;
-        roundResultPoints.textContent = pointsGained;
         countGuessed.textContent = roundGuessed.length;
         countSkipped.textContent = roundSkipped.length;
 
@@ -2300,7 +2412,27 @@
           nextTurnBtn.textContent = `Следующий ход: ${nextTeam.name}`;
         }
 
-        // Рендер лидерборда на экране итогов
+        renderRoundLeaderboard();
+
+        saveActiveMatchState();
+        showScreen(screenRoundResults);
+      }
+
+      function applyRoundScoring() {
+        if (!roundScoresBefore.length) roundScoresBefore = teams.map(t => t.score);
+        teams.forEach((team, index) => {
+          team.score = roundScoresBefore[index] || 0;
+        });
+        roundScoring.forEach(entry => {
+          if (Number.isInteger(entry.awardedTo) && teams[entry.awardedTo]) teams[entry.awardedTo].score += 1;
+        });
+        const activeTeamPoints = roundScoring.filter(entry => entry.awardedTo === currentTeamTurnIndex).length;
+        roundResultPoints.textContent = activeTeamPoints;
+        renderRoundLeaderboard();
+        saveActiveMatchState();
+      }
+
+      function renderRoundLeaderboard() {
         roundLeaderboardBlock.innerHTML = `
           <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Турнирная таблица:</div>
           ${teams.slice(0, numTeams).map((t, idx) => `
@@ -2310,9 +2442,6 @@
             </div>
           `).join('')}
         `;
-
-        saveActiveMatchState();
-        showScreen(screenRoundResults);
       }
 
       function checkMatchEndCondition() {
@@ -2358,7 +2487,8 @@
         tabBtnGuessed.classList.toggle('active', activeResultTab === 'guessed');
         tabBtnSkipped.classList.toggle('active', activeResultTab === 'skipped');
 
-        const list = activeResultTab === 'guessed' ? roundGuessed : roundSkipped;
+        const source = activeResultTab === 'guessed' ? 'guessed' : 'skipped';
+        const list = roundScoring.filter(entry => entry.source === source);
         roundCardsList.innerHTML = "";
 
         if (list.length === 0) {
@@ -2368,19 +2498,36 @@
         }
 
         list.forEach(item => {
+          const scoringIndex = roundScoring.indexOf(item);
           const row = document.createElement('div');
           row.className = 'result-word-row';
           row.innerHTML = `
             <div class="result-word-left">
-              <div class="result-symbol-mini">${getSignSvg(item.code)}</div>
+              <div class="result-symbol-mini">${getSignSvg(item.card.code)}</div>
               <div>
-                <div class="result-word-text">${escapeHtml(item.word)}</div>
-                <div class="result-word-hint">${escapeHtml(item.hint)}</div>
+                <div class="result-word-text">${escapeHtml(item.card.word)}</div>
+                <div class="result-word-hint">${escapeHtml(item.card.hint)}</div>
               </div>
             </div>
-            <div style="font-size: 0.72rem; color: var(--iof-orange); font-weight: 700; white-space: nowrap;">Знак ${item.code}</div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+              <div style="font-size: 0.72rem; color: var(--iof-orange); font-weight: 700; white-space: nowrap;">Знак ${item.card.code}</div>
+              <label style="font-size: 0.7rem; color: var(--text-muted);">Балл:
+                <select class="award-select" data-award-entry="${scoringIndex}" style="margin-left: 4px; max-width: 135px; background: var(--surface-input); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px;">
+                  <option value="">Без очка</option>
+                  ${teams.slice(0, numTeams).map((team, index) => `<option value="${index}" ${item.awardedTo === index ? 'selected' : ''}>${escapeHtml(team.name)}</option>`).join('')}
+                </select>
+              </label>
+            </div>
           `;
           roundCardsList.appendChild(row);
+        });
+
+        document.querySelectorAll('.award-select').forEach(select => {
+          select.addEventListener('change', () => {
+            const entry = roundScoring[parseInt(select.dataset.awardEntry, 10)];
+            entry.awardedTo = select.value === '' ? null : parseInt(select.value, 10);
+            applyRoundScoring();
+          });
         });
       }
 
