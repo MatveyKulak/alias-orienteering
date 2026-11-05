@@ -1067,6 +1067,63 @@
         gap: 8px;
       }
 
+      .changelog-card {
+        max-height: min(76dvh, 620px);
+        overflow: hidden;
+      }
+
+      .changelog-list {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 0;
+        padding-right: 4px;
+        text-align: left;
+      }
+
+      .changelog-release {
+        padding: 12px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.35);
+      }
+
+      .changelog-release.current {
+        border-color: rgba(249, 115, 22, 0.55);
+        background: rgba(249, 115, 22, 0.1);
+      }
+
+      .changelog-release h4 {
+        font-size: 0.92rem;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+
+      .changelog-release time {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .changelog-release ul {
+        margin: 7px 0 0 18px;
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .update-dot {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        top: -3px;
+        right: -3px;
+        border-radius: 50%;
+        background: var(--iof-orange);
+        border: 2px solid var(--bg-main);
+      }
+
       @media (max-width: 600px) {
         .card-word {
           font-size: 1.95rem;
@@ -1089,6 +1146,13 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="updatesBtn" class="icon-btn" title="Что нового" aria-label="Что нового" style="position: relative;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+          </svg>
+          <span id="updatesDot" class="update-dot" style="display: none;"></span>
+        </button>
         <button id="themeSettingsBtn" class="icon-btn" title="Настройки оформления" aria-label="Настройки оформления">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -1412,6 +1476,15 @@
           <button type="button" class="segment-btn" data-theme-choice="light">Светлая</button>
         </div>
         <button id="closeThemeModalBtn" class="btn-secondary" type="button" style="width: 100%;">Готово</button>
+      </div>
+    </div>
+
+    <div id="changelogModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card changelog-card">
+        <h3 class="modal-title">Что нового</h3>
+        <p id="changelogIntro" class="modal-desc"></p>
+        <div id="changelogList" class="changelog-list"></div>
+        <button id="closeChangelogBtn" class="btn-primary" type="button">Понятно</button>
       </div>
     </div>
 
@@ -1901,6 +1974,52 @@
       const STORAGE_KEY_CONFIG = "orienteering_alias_config";
       const STORAGE_KEY_STATE = "orienteering_alias_active_state";
       const STORAGE_KEY_THEME = "orienteering_alias_theme";
+      const STORAGE_KEY_SEEN_CHANGELOG = "orienteering_alias_seen_changelog";
+      const APP_VERSION = "0.4.0";
+      const CHANGELOG = [
+        {
+          version: "β 0.4.0",
+          date: "5 ноября 2026",
+          items: [
+            "Настройки темы: системная, тёмная и светлая.",
+            "Своё число кругов, очков и секунд на раунд.",
+            "Режим «Один на один» с именами игроков и чередованием ходов.",
+            "Кнопки возврата и скачивание автономного файла игры."
+          ]
+        },
+        {
+          version: "β 0.3.0",
+          date: "5 ноября 2026",
+          items: [
+            "Отдельная лесная колода ISOM — она не смешивается со спринтом.",
+            "Добавлены и уточнены лесные знаки по результатам проверки.",
+            "Реестр лесных знаков для проверки карточек."
+          ]
+        },
+        {
+          version: "β 0.2.1",
+          date: "4 ноября 2026",
+          items: [
+            "После сигнала последнее слово можно отгадывать без ограничения времени.",
+            "Очко за последнее слово можно отдать первой ответившей стороне на экране проверки.",
+            "Уточнены рисунки спринтовых знаков."
+          ]
+        },
+        {
+          version: "β 0.2.0",
+          date: "4 ноября 2026",
+          items: [
+            "Ультрахард: только рисунок знака.",
+            "Размер команды от 2 до 6 игроков.",
+            "После раунда можно исправлять баллы за угаданные и пропущенные слова."
+          ]
+        },
+        {
+          version: "β 0.1.0",
+          date: "2 ноября 2026",
+          items: ["Первый этап визуального оформления и иконок игры."]
+        }
+      ];
 
       const TEAM_COLORS = ["#f97316", "#10b981", "#3b82f6", "#a855f7"];
       const DEFAULT_TEAM_NAMES = ["Азимут", "Призма", "Компас", "Спринтеры"];
@@ -2102,6 +2221,12 @@
       const soundToggleBtn = document.getElementById('soundToggleBtn');
       const soundIconOn = document.getElementById('soundIconOn');
       const soundIconOff = document.getElementById('soundIconOff');
+      const updatesBtn = document.getElementById('updatesBtn');
+      const updatesDot = document.getElementById('updatesDot');
+      const changelogModal = document.getElementById('changelogModal');
+      const changelogIntro = document.getElementById('changelogIntro');
+      const changelogList = document.getElementById('changelogList');
+      const closeChangelogBtn = document.getElementById('closeChangelogBtn');
       const themeSettingsBtn = document.getElementById('themeSettingsBtn');
       const themeModal = document.getElementById('themeModal');
       const closeThemeModalBtn = document.getElementById('closeThemeModalBtn');
@@ -3179,6 +3304,36 @@
         button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
       });
 
+      function renderChangelog() {
+        changelogIntro.textContent = `Версия β ${APP_VERSION}. Здесь собраны все заметные обновления игры.`;
+        changelogList.innerHTML = CHANGELOG.map((release, index) => `
+          <article class="changelog-release ${index === 0 ? 'current' : ''}">
+            <h4>${release.version}</h4>
+            <time>${release.date}</time>
+            <ul>${release.items.map(item => `<li>${item}</li>`).join('')}</ul>
+          </article>
+        `).join('');
+      }
+
+      function openChangelog() {
+        renderChangelog();
+        changelogModal.classList.add('active');
+        changelogModal.setAttribute('aria-hidden', 'false');
+        updatesDot.style.display = 'none';
+        try { localStorage.setItem(STORAGE_KEY_SEEN_CHANGELOG, APP_VERSION); } catch (e) {}
+      }
+
+      function closeChangelog() {
+        changelogModal.classList.remove('active');
+        changelogModal.setAttribute('aria-hidden', 'true');
+      }
+
+      updatesBtn.addEventListener('click', openChangelog);
+      closeChangelogBtn.addEventListener('click', closeChangelog);
+      changelogModal.addEventListener('click', (event) => {
+        if (event.target === changelogModal) closeChangelog();
+      });
+
       function escapeHtml(str) {
         if (!str) return '';
         return String(str)
@@ -3203,6 +3358,14 @@
       setupSettingsEvents();
       loadConfig();
       if (window.history) history.replaceState({ aliasScreen: 'screenSettings' }, '', location.href);
+      try {
+        if (localStorage.getItem(STORAGE_KEY_SEEN_CHANGELOG) !== APP_VERSION) {
+          updatesDot.style.display = '';
+          setTimeout(openChangelog, 250);
+        }
+      } catch (e) {
+        updatesDot.style.display = '';
+      }
     </script>
   </body>
 </html>
