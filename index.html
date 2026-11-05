@@ -32,6 +32,40 @@
         --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       }
 
+      html[data-theme="light"] {
+        color-scheme: light;
+        --bg-main: #eaf0f7;
+        --surface-card: #ffffff;
+        --surface-elevated: #e2e8f0;
+        --surface-input: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --border-subtle: rgba(15, 23, 42, 0.14);
+      }
+
+      html[data-theme="light"] header {
+        background-color: rgba(255, 255, 255, 0.94);
+      }
+
+      @media (prefers-color-scheme: light) {
+        html[data-theme="system"] {
+          color-scheme: light;
+          --bg-main: #eaf0f7;
+          --surface-card: #ffffff;
+          --surface-elevated: #e2e8f0;
+          --surface-input: #f8fafc;
+          --text-primary: #0f172a;
+          --text-secondary: #475569;
+          --text-muted: #64748b;
+          --border-subtle: rgba(15, 23, 42, 0.14);
+        }
+
+        html[data-theme="system"] header {
+          background-color: rgba(255, 255, 255, 0.94);
+        }
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -92,11 +126,11 @@
       }
 
       .brand-badge {
-        font-size: 0.7rem;
+        font-size: 0.62rem;
         font-weight: 600;
         color: var(--iof-orange);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
+        line-height: 1.25;
       }
 
       .header-actions {
@@ -205,6 +239,31 @@
         font-size: 0.85rem;
         font-weight: 700;
         cursor: pointer;
+      }
+
+      .custom-setting-panel {
+        display: none;
+        gap: 10px;
+        padding: 12px;
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+      }
+
+      .custom-setting-panel.visible {
+        display: grid;
+      }
+
+      .custom-number-input {
+        width: 100%;
+        min-height: 42px;
+        padding: 8px 10px;
+        color: var(--text-primary);
+        background: var(--surface-input);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 700;
       }
 
       /* --- ЭКРАН 1: НАСТРОЙКИ --- */
@@ -1025,11 +1084,17 @@
       <div class="brand">
         <div class="iof-prism-icon" title="КП IOF"></div>
         <div>
-          <h1 class="brand-title">Алиас: Ориентирование</h1>
-          <div class="brand-badge">Стандарт ISSprOM 2019-2</div>
+          <h1 class="brand-title">Алиас: Спортивное ориентирование</h1>
+          <div class="brand-badge">ISSprOM + ISOM · β 0.4.0 · Вело- и лыжное ориентирование — в разработке</div>
         </div>
       </div>
       <div class="header-actions">
+        <button id="themeSettingsBtn" class="icon-btn" title="Настройки оформления" aria-label="Настройки оформления">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V20.3h-3v-.08A1.7 1.7 0 0 0 10.66 18.66a1.7 1.7 0 0 0-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.56-1.04h-.08v-3h.08A1.7 1.7 0 0 0 7 9.92a1.7 1.7 0 0 0-.34-1.88L6.6 7.98l2.12-2.12.06.06A1.7 1.7 0 0 0 10.66 6.26a1.7 1.7 0 0 0 1.04-1.56v-.08h3v.08a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0 0 19.4 9.92a1.7 1.7 0 0 0 1.56 1.04h.08v3h-.08A1.7 1.7 0 0 0 19.4 15z"></path>
+          </svg>
+        </button>
         <button id="soundToggleBtn" class="icon-btn" title="Звук (вкл/выкл)" aria-label="Звук">
           <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -1120,6 +1185,15 @@
             </div>
           </div>
 
+          <div id="soloConfigBlock" style="display: none;">
+            <label class="setting-label">Игроки</label>
+            <div class="players-grid">
+              <input id="soloPlayerOne" class="player-input" type="text" placeholder="Игрок 1" />
+              <input id="soloPlayerTwo" class="player-input" type="text" placeholder="Игрок 2" />
+            </div>
+            <div class="diff-desc">Игроки ходят по очереди. Круг — это по одному ходу каждого.</div>
+          </div>
+
           <!-- Условие победы (в командном режиме) -->
           <div id="goalConfigBlock">
             <label class="setting-label">Условие победы</label>
@@ -1128,6 +1202,17 @@
               <button type="button" class="segment-btn" data-goal="rounds" data-val="5">5 кругов</button>
               <button type="button" class="segment-btn" data-goal="score" data-val="25">До 25 очков</button>
               <button type="button" class="segment-btn" data-goal="score" data-val="40">До 40 очков</button>
+              <button type="button" id="customGoalBtn" class="segment-btn" style="grid-column: 1 / -1;">Свои условия</button>
+            </div>
+            <div id="customGoalPanel" class="custom-setting-panel" style="margin-top: 8px;">
+              <div class="segmented-control" style="grid-template-columns: 1fr 1fr;">
+                <button type="button" class="segment-btn active" data-custom-goal-type="rounds">Круги</button>
+                <button type="button" class="segment-btn" data-custom-goal-type="score">Очки</button>
+              </div>
+              <label style="font-size: 0.82rem; color: var(--text-secondary);">Количество
+                <input id="customGoalValue" class="custom-number-input" type="number" min="1" max="99" inputmode="numeric" value="3" />
+              </label>
+              <div id="customGoalHint" class="diff-desc">Круг — это один ход каждой команды.</div>
             </div>
           </div>
 
@@ -1138,6 +1223,12 @@
               <button type="button" class="segment-btn" data-time="30">30 сек</button>
               <button type="button" class="segment-btn active" data-time="60">60 сек</button>
               <button type="button" class="segment-btn" data-time="90">90 сек</button>
+              <button type="button" id="customTimeBtn" class="segment-btn" style="grid-column: 1 / -1;">Своё время</button>
+            </div>
+            <div id="customTimePanel" class="custom-setting-panel" style="margin-top: 8px;">
+              <label style="font-size: 0.82rem; color: var(--text-secondary);">Секунд на раунд
+                <input id="customTimeValue" class="custom-number-input" type="number" min="10" max="600" inputmode="numeric" value="60" />
+              </label>
             </div>
           </div>
 
@@ -1145,6 +1236,7 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             Начать игру
           </button>
+          <button id="downloadGameBtn" class="btn-secondary" type="button">⇩ Скачать автономный файл игры (.html)</button>
         </div>
       </section>
 
@@ -1153,7 +1245,7 @@
         <div class="ready-card">
           <div class="ready-badge" id="readyRoundBadge">Раунд 1 из 3</div>
           <div>
-            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 4px;">Ход команды:</div>
+            <div id="readyTurnLabel" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 4px;">Ход команды:</div>
             <h2 id="readyTeamName" class="ready-team-title" style="color: var(--team-1);">Азимут</h2>
           </div>
 
@@ -1176,6 +1268,7 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             Поехали! Старт
           </button>
+          <button id="readyBackBtn" class="btn-secondary" type="button">← К настройкам</button>
         </div>
       </section>
 
@@ -1306,6 +1399,19 @@
           <button id="btnConfirmCancelGame" class="btn-secondary" style="padding: 12px; color: #f87171;">Отменить игру в меню</button>
           <button id="btnResumeRound" class="btn-secondary" style="padding: 12px;">Продолжить раунд</button>
         </div>
+      </div>
+    </div>
+
+    <div id="themeModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card">
+        <h3 class="modal-title">Настройки</h3>
+        <p class="modal-desc">Оформление игры</p>
+        <div class="segmented-control" style="grid-template-columns: repeat(3, 1fr); margin: 16px 0;">
+          <button type="button" class="segment-btn" data-theme-choice="system">Система</button>
+          <button type="button" class="segment-btn" data-theme-choice="dark">Тёмная</button>
+          <button type="button" class="segment-btn" data-theme-choice="light">Светлая</button>
+        </div>
+        <button id="closeThemeModalBtn" class="btn-secondary" type="button" style="width: 100%;">Готово</button>
       </div>
     </div>
 
@@ -1794,6 +1900,7 @@
          ========================================================================== */
       const STORAGE_KEY_CONFIG = "orienteering_alias_config";
       const STORAGE_KEY_STATE = "orienteering_alias_active_state";
+      const STORAGE_KEY_THEME = "orienteering_alias_theme";
 
       const TEAM_COLORS = ["#f97316", "#10b981", "#3b82f6", "#a855f7"];
       const DEFAULT_TEAM_NAMES = ["Азимут", "Призма", "Компас", "Спринтеры"];
@@ -1811,6 +1918,9 @@
       let goalType = "rounds"; // "rounds" | "score"
       let goalValue = 3; // 3 круга или N очков
       let roundDuration = 60; // 30, 60, 90
+      let goalCustom = false;
+      let timeCustom = false;
+      let teamsBeforeSolo = null;
 
       // Состояние активного матча
       let currentRoundNumber = 1;
@@ -1828,6 +1938,7 @@
       let lastWordMode = false;
       let roundEnding = false;
       let soundEnabled = true;
+      let resultsBackState = null;
 
       // Длина окружности SVG таймера
       const TIMER_CIRCUMFERENCE = 113.1;
@@ -1926,16 +2037,29 @@
       const diffDesc = document.getElementById('diffDesc');
       const standardDesc = document.getElementById('standardDesc');
       const teamsConfigBlock = document.getElementById('teamsConfigBlock');
+      const soloConfigBlock = document.getElementById('soloConfigBlock');
+      const soloPlayerOne = document.getElementById('soloPlayerOne');
+      const soloPlayerTwo = document.getElementById('soloPlayerTwo');
       const teamsBuilder = document.getElementById('teamsBuilder');
       const goalConfigBlock = document.getElementById('goalConfigBlock');
       const startSetupBtn = document.getElementById('startSetupBtn');
+      const downloadGameBtn = document.getElementById('downloadGameBtn');
+      const customGoalBtn = document.getElementById('customGoalBtn');
+      const customGoalPanel = document.getElementById('customGoalPanel');
+      const customGoalValue = document.getElementById('customGoalValue');
+      const customGoalHint = document.getElementById('customGoalHint');
+      const customTimeBtn = document.getElementById('customTimeBtn');
+      const customTimePanel = document.getElementById('customTimePanel');
+      const customTimeValue = document.getElementById('customTimeValue');
 
       const readyRoundBadge = document.getElementById('readyRoundBadge');
+      const readyTurnLabel = document.getElementById('readyTurnLabel');
       const readyTeamName = document.getElementById('readyTeamName');
       const readyExplainingPlayer = document.getElementById('readyExplainingPlayer');
       const readyGuessingPlayers = document.getElementById('readyGuessingPlayers');
       const readyLeaderboardBlock = document.getElementById('readyLeaderboardBlock');
       const readyStartRoundBtn = document.getElementById('readyStartRoundBtn');
+      const readyBackBtn = document.getElementById('readyBackBtn');
 
       const btnEarlyQuit = document.getElementById('btnEarlyQuit');
       const hudTeamDot = document.getElementById('hudTeamDot');
@@ -1978,15 +2102,47 @@
       const soundToggleBtn = document.getElementById('soundToggleBtn');
       const soundIconOn = document.getElementById('soundIconOn');
       const soundIconOff = document.getElementById('soundIconOff');
+      const themeSettingsBtn = document.getElementById('themeSettingsBtn');
+      const themeModal = document.getElementById('themeModal');
+      const closeThemeModalBtn = document.getElementById('closeThemeModalBtn');
 
       /* ==========================================================================
          УПРАВЛЕНИЕ ЭКРАНАМИ
          ========================================================================== */
-      function showScreen(screenEl) {
+      function showScreen(screenEl, rememberInHistory = true) {
         [screenSettings, screenReady, screenGame, screenRoundResults, screenPodium].forEach(s => s.classList.remove('active'));
         screenEl.classList.add('active');
         window.scrollTo(0, 0);
+        if (rememberInHistory && window.history && history.state?.aliasScreen !== screenEl.id) {
+          history.pushState({ aliasScreen: screenEl.id }, '', location.href);
+        }
       }
+
+      window.addEventListener('popstate', (event) => {
+        const targetId = event.state?.aliasScreen;
+        if (!targetId) return;
+
+        if (screenGame.classList.contains('active')) {
+          history.pushState({ aliasScreen: 'screenGame' }, '', location.href);
+          isPaused = true;
+          earlyQuitModal.classList.add('active');
+          return;
+        }
+
+        if (screenReady.classList.contains('active') && (targetId === 'screenSettings' || (targetId === 'screenRoundResults' && resultsBackState))) {
+          goBackFromReady();
+          return;
+        }
+
+        if (screenRoundResults.classList.contains('active') || screenPodium.classList.contains('active')) {
+          const current = screenRoundResults.classList.contains('active') ? 'screenRoundResults' : 'screenPodium';
+          history.pushState({ aliasScreen: current }, '', location.href);
+          return;
+        }
+
+        const target = document.getElementById(targetId);
+        if (target) showScreen(target, false);
+      });
 
       /* ==========================================================================
          ИНИЦИАЛИЗАЦИЯ И РЕНДЕР НАСТРОЕК
@@ -2027,7 +2183,7 @@
         }
 
         // Слушатели ввода имен команд и игроков
-        document.querySelectorAll('.team-name-input').forEach(input => {
+        teamsBuilder.querySelectorAll('.team-name-input').forEach(input => {
           input.addEventListener('input', (e) => {
             const idx = parseInt(e.target.dataset.teamIdx, 10);
             teams[idx].name = e.target.value.trim() || `Команда ${idx + 1}`;
@@ -2035,7 +2191,7 @@
           });
         });
 
-        document.querySelectorAll('.player-input').forEach(input => {
+        teamsBuilder.querySelectorAll('.player-input').forEach(input => {
           input.addEventListener('input', (e) => {
             const tIdx = parseInt(e.target.dataset.teamIdx, 10);
             const pIdx = parseInt(e.target.dataset.playerIdx, 10);
@@ -2043,6 +2199,38 @@
             saveConfig();
           });
         });
+      }
+
+      function syncSoloPlayersUI() {
+        while (teams.length < 2) {
+          const index = teams.length;
+          teams.push({ name: `Игрок ${index + 1}`, color: TEAM_COLORS[index], score: 0, players: [`Игрок ${index + 1}`], nextPlayerIdx: 0 });
+        }
+        if (!teams[0].name || teams[0].name === 'Азимут') teams[0].name = 'Игрок 1';
+        if (!teams[1].name || teams[1].name === 'Призма') teams[1].name = 'Игрок 2';
+        teams.slice(0, 2).forEach((team, index) => {
+          team.players = [team.name];
+          team.nextPlayerIdx = 0;
+          if (!team.color) team.color = TEAM_COLORS[index];
+        });
+        soloPlayerOne.value = teams[0].name;
+        soloPlayerTwo.value = teams[1].name;
+      }
+
+      function cloneTeams(source) {
+        return source.map(team => ({ ...team, players: [...(team.players || [])] }));
+      }
+
+      function enterSoloMode() {
+        if (!teamsBeforeSolo) teamsBeforeSolo = cloneTeams(teams);
+        numTeams = 2;
+        syncSoloPlayersUI();
+      }
+
+      function leaveSoloMode() {
+        if (teamsBeforeSolo) teams = cloneTeams(teamsBeforeSolo);
+        teamsBeforeSolo = null;
+        renderTeamsBuilder();
       }
 
       function updateDifficultyDescription() {
@@ -2061,15 +2249,69 @@
           : 'Спринтовые знаки ISSprOM. Лесные знаки ISOM в колоду не попадут.';
       }
 
+      function updateCustomSettingsUI() {
+        document.querySelectorAll('[data-goal]').forEach(button => {
+          button.classList.toggle('active', !goalCustom && button.dataset.goal === goalType && parseInt(button.dataset.val, 10) === goalValue);
+        });
+        customGoalBtn.classList.toggle('active', goalCustom);
+        customGoalPanel.classList.toggle('visible', goalCustom);
+        customGoalValue.value = goalValue;
+        document.querySelectorAll('[data-custom-goal-type]').forEach(button => {
+          button.classList.toggle('active', button.dataset.customGoalType === goalType);
+        });
+        customGoalHint.style.display = goalType === 'rounds' ? '' : 'none';
+
+        document.querySelectorAll('[data-time]').forEach(button => {
+          button.classList.toggle('active', !timeCustom && parseInt(button.dataset.time, 10) === roundDuration);
+        });
+        customTimeBtn.classList.toggle('active', timeCustom);
+        customTimePanel.classList.toggle('visible', timeCustom);
+        customTimeValue.value = roundDuration;
+      }
+
+      function downloadOfflineGame() {
+        const copy = document.documentElement.cloneNode(true);
+        copy.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+        copy.querySelector('#screenSettings').classList.add('active');
+        copy.querySelector('#earlyQuitModal').classList.remove('active');
+        const blob = new Blob(['<!doctype html>\n' + copy.outerHTML], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'alias-sport-orienteering-beta-0.4.0.html';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
       function setupSettingsEvents() {
         // Режим: Команды vs Соло
         document.querySelectorAll('[data-mode]').forEach(btn => {
           btn.addEventListener('click', () => {
+            const previousMode = gameMode;
             document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             gameMode = btn.dataset.mode;
             teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
-            goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+            soloConfigBlock.style.display = gameMode === 'solo' ? 'block' : 'none';
+            goalConfigBlock.style.display = 'block';
+            if (gameMode === 'solo') {
+              if (previousMode !== 'solo') enterSoloMode();
+              else syncSoloPlayersUI();
+            } else if (previousMode === 'solo') {
+              leaveSoloMode();
+            }
+            saveConfig();
+          });
+        });
+
+        [soloPlayerOne, soloPlayerTwo].forEach((input, index) => {
+          input.addEventListener('input', () => {
+            const fallback = `Игрок ${index + 1}`;
+            const name = input.value.trim() || fallback;
+            teams[index].name = name;
+            teams[index].players = [name];
             saveConfig();
           });
         });
@@ -2119,28 +2361,65 @@
         // Условие победы (Раунды vs Очки)
         document.querySelectorAll('[data-goal]').forEach(btn => {
           btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-goal]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
             goalType = btn.dataset.goal;
             goalValue = parseInt(btn.dataset.val, 10);
+            goalCustom = false;
+            updateCustomSettingsUI();
             saveConfig();
           });
+        });
+
+        customGoalBtn.addEventListener('click', () => {
+          goalCustom = true;
+          updateCustomSettingsUI();
+          saveConfig();
+        });
+
+        document.querySelectorAll('[data-custom-goal-type]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            goalType = btn.dataset.customGoalType;
+            goalCustom = true;
+            updateCustomSettingsUI();
+            saveConfig();
+          });
+        });
+
+        customGoalValue.addEventListener('change', () => {
+          goalValue = Math.max(1, Math.min(99, parseInt(customGoalValue.value, 10) || 1));
+          goalCustom = true;
+          updateCustomSettingsUI();
+          saveConfig();
         });
 
         // Время раунда (30, 60, 90)
         document.querySelectorAll('[data-time]').forEach(btn => {
           btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
             roundDuration = parseInt(btn.dataset.time, 10);
+            timeCustom = false;
+            updateCustomSettingsUI();
             saveConfig();
           });
+        });
+
+        customTimeBtn.addEventListener('click', () => {
+          timeCustom = true;
+          updateCustomSettingsUI();
+          saveConfig();
+        });
+
+        customTimeValue.addEventListener('change', () => {
+          roundDuration = Math.max(10, Math.min(600, parseInt(customTimeValue.value, 10) || 10));
+          timeCustom = true;
+          updateCustomSettingsUI();
+          saveConfig();
         });
 
         // Старт игры из настроек
         startSetupBtn.addEventListener('click', () => {
           startNewMatch();
         });
+
+        downloadGameBtn.addEventListener('click', downloadOfflineGame);
 
         // Возобновление сохраненной игры
         resumeGameBtn.addEventListener('click', () => {
@@ -2155,7 +2434,7 @@
 
       function saveConfig() {
         try {
-          const config = { gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration };
+          const config = { gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, teamsBeforeSolo, goalType, goalValue, roundDuration, goalCustom, timeCustom };
           localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
         } catch (e) {}
       }
@@ -2171,16 +2450,30 @@
             if (c.numTeams) numTeams = c.numTeams;
             if (c.playersPerTeam >= 2 && c.playersPerTeam <= 6) playersPerTeam = c.playersPerTeam;
             if (c.teams && Array.isArray(c.teams)) teams = c.teams;
+            if (c.teamsBeforeSolo && Array.isArray(c.teamsBeforeSolo)) teamsBeforeSolo = c.teamsBeforeSolo;
             if (c.goalType) goalType = c.goalType;
             if (c.goalValue) goalValue = c.goalValue;
             if (c.roundDuration) roundDuration = c.roundDuration;
+            if (typeof c.goalCustom === 'boolean') goalCustom = c.goalCustom;
+            if (typeof c.timeCustom === 'boolean') timeCustom = c.timeCustom;
           }
         } catch (e) {}
 
         // Синхронизация UI кнопок
         document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === gameMode));
         teamsConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
-        goalConfigBlock.style.display = gameMode === 'teams' ? 'block' : 'none';
+        soloConfigBlock.style.display = gameMode === 'solo' ? 'block' : 'none';
+        goalConfigBlock.style.display = 'block';
+        if (gameMode === 'solo') {
+          enterSoloMode();
+        } else if (!teamsBeforeSolo && teams[0]?.name === 'Игрок 1' && teams[1]?.name === 'Игрок 2') {
+          // Исправление конфигурации, сохраненной предыдущей версией: она по ошибке
+          // перезаписывала первые две команды именами игроков.
+          teams[0].name = DEFAULT_TEAM_NAMES[0];
+          teams[1].name = DEFAULT_TEAM_NAMES[1];
+          teams[0].players = ['Игрок 1', 'Игрок 2', 'Игрок 3', 'Игрок 4'];
+          teams[1].players = ['Игрок 1', 'Игрок 2', 'Игрок 3', 'Игрок 4'];
+        }
 
         document.querySelectorAll('[data-standard]').forEach(b => b.classList.toggle('active', b.dataset.standard === mapStandard));
         document.querySelectorAll('[data-diff]').forEach(b => b.classList.toggle('active', b.dataset.diff === difficulty));
@@ -2188,8 +2481,7 @@
 
         document.querySelectorAll('[data-teams]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.teams, 10) === numTeams));
         document.querySelectorAll('[data-players]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.players, 10) === playersPerTeam));
-        document.querySelectorAll('[data-goal]').forEach(b => b.classList.toggle('active', b.dataset.goal === goalType && parseInt(b.dataset.val, 10) === goalValue));
-        document.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.time, 10) === roundDuration));
+        updateCustomSettingsUI();
 
         renderTeamsBuilder();
         checkActiveGameSaved();
@@ -2209,7 +2501,7 @@
       function saveActiveMatchState() {
         try {
           const state = {
-            gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration,
+            gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration, goalCustom, timeCustom,
             currentRoundNumber, currentTeamTurnIndex,
             deck, cardIdx, roundGuessed, roundSkipped, roundScoring, roundScoresBefore
           };
@@ -2231,6 +2523,8 @@
           goalType = s.goalType;
           goalValue = s.goalValue;
           roundDuration = s.roundDuration;
+          goalCustom = Boolean(s.goalCustom);
+          timeCustom = Boolean(s.timeCustom);
           currentRoundNumber = s.currentRoundNumber || 1;
           currentTeamTurnIndex = s.currentTeamTurnIndex || 0;
           deck = s.deck && s.deck.length && s.mapStandard ? s.deck : shuffleArray(getWordsForStandard(mapStandard));
@@ -2260,20 +2554,21 @@
         cardIdx = 0;
         roundScoring = [];
         roundScoresBefore = [];
+        resultsBackState = null;
 
         saveActiveMatchState();
 
-        if (gameMode === 'solo') {
-          startActiveRound();
-        } else {
-          prepareTurnHandover();
-        }
+        prepareTurnHandover();
       }
 
       function prepareTurnHandover() {
         const team = teams[currentTeamTurnIndex];
-        const explainingPlayer = team.players[team.nextPlayerIdx % team.players.length] || `Игрок ${(team.nextPlayerIdx % team.players.length) + 1}`;
-        const guessingPlayers = team.players.filter((_, idx) => idx !== (team.nextPlayerIdx % team.players.length)).join(', ') || 'Вся команда';
+        const explainingPlayer = gameMode === 'solo'
+          ? team.name
+          : (team.players[team.nextPlayerIdx % team.players.length] || `Игрок ${(team.nextPlayerIdx % team.players.length) + 1}`);
+        const guessingPlayers = gameMode === 'solo'
+          ? 'Соперник'
+          : (team.players.filter((_, idx) => idx !== (team.nextPlayerIdx % team.players.length)).join(', ') || 'Вся команда');
 
         if (goalType === 'rounds') {
           readyRoundBadge.textContent = `Круг ${currentRoundNumber} из ${goalValue}`;
@@ -2283,6 +2578,7 @@
 
         readyTeamName.textContent = team.name;
         readyTeamName.style.color = team.color;
+        readyTurnLabel.textContent = gameMode === 'solo' ? 'Ход игрока:' : 'Ход команды:';
         readyExplainingPlayer.textContent = explainingPlayer;
         readyGuessingPlayers.textContent = guessingPlayers;
 
@@ -2297,6 +2593,8 @@
           `).join('')}
         `;
 
+        readyBackBtn.textContent = resultsBackState ? '← К проверке слов' : '← К настройкам';
+
         showScreen(screenReady);
       }
 
@@ -2304,11 +2602,28 @@
         startActiveRound();
       });
 
+      function goBackFromReady() {
+        if (resultsBackState) {
+          currentTeamTurnIndex = resultsBackState.teamIndex;
+          currentRoundNumber = resultsBackState.roundNumber;
+          resultsBackState = null;
+          saveActiveMatchState();
+          showScreen(screenRoundResults);
+          return;
+        }
+        localStorage.removeItem(STORAGE_KEY_STATE);
+        checkActiveGameSaved();
+        showScreen(screenSettings);
+      }
+
+      readyBackBtn.addEventListener('click', goBackFromReady);
+
       /* ==========================================================================
          АКТИВНЫЙ ИГРОВОЙ РАУНД (С УЧЕТОМ СЛОЖНОСТИ)
          ========================================================================== */
       function startActiveRound() {
         if (timerInterval) clearInterval(timerInterval);
+        resultsBackState = null;
 
         roundGuessed = [];
         roundSkipped = [];
@@ -2321,7 +2636,7 @@
         swipeHelperBar.textContent = 'Свайп вверх / [↑] — Угадано • Свайп вниз / [↓] — Пропуск';
         wordCard.querySelector('.swipe-cue-down').style.display = '';
 
-        const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : { name: "Разминка", color: "var(--iof-orange)" };
+        const team = teams[currentTeamTurnIndex];
         hudTeamDot.style.background = team.color;
         hudTeamName.textContent = team.name;
 
@@ -2516,7 +2831,7 @@
       function finishCurrentTurn() {
         if (!lastWordMode) playSound('buzzer');
 
-        const team = gameMode === 'teams' ? teams[currentTeamTurnIndex] : teams[0];
+        const team = teams[currentTeamTurnIndex];
         roundScoresBefore = teams.map(t => t.score);
         roundScoring = [
           ...roundGuessed.map((card, sourceIndex) => ({ card, source: 'guessed', sourceIndex, awardedTo: currentTeamTurnIndex })),
@@ -2578,8 +2893,6 @@
       }
 
       function checkMatchEndCondition() {
-        if (gameMode === 'solo') return false;
-
         // Если игра до определенного количества очков
         if (goalType === 'score') {
           const leader = teams.slice(0, numTeams).reduce((max, t) => t.score > max.score ? t : max, teams[0]);
@@ -2607,6 +2920,7 @@
         }
 
         // Переход к следующей команде
+        resultsBackState = { teamIndex: currentTeamTurnIndex, roundNumber: currentRoundNumber };
         currentTeamTurnIndex = (currentTeamTurnIndex + 1) % numTeams;
         if (currentTeamTurnIndex === 0) {
           currentRoundNumber++;
@@ -2838,6 +3152,33 @@
         if (soundEnabled) playSound('guess');
       });
 
+      function applyTheme(theme) {
+        const selected = ['system', 'dark', 'light'].includes(theme) ? theme : 'system';
+        document.documentElement.dataset.theme = selected;
+        document.querySelectorAll('[data-theme-choice]').forEach(button => {
+          button.classList.toggle('active', button.dataset.themeChoice === selected);
+        });
+        try { localStorage.setItem(STORAGE_KEY_THEME, selected); } catch (e) {}
+      }
+
+      themeSettingsBtn.addEventListener('click', () => {
+        themeModal.classList.add('active');
+        themeModal.setAttribute('aria-hidden', 'false');
+      });
+
+      closeThemeModalBtn.addEventListener('click', () => {
+        themeModal.classList.remove('active');
+        themeModal.setAttribute('aria-hidden', 'true');
+      });
+
+      themeModal.addEventListener('click', (event) => {
+        if (event.target === themeModal) closeThemeModalBtn.click();
+      });
+
+      document.querySelectorAll('[data-theme-choice]').forEach(button => {
+        button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
+      });
+
       function escapeHtml(str) {
         if (!str) return '';
         return String(str)
@@ -2858,8 +3199,10 @@
       }
 
       // Инициализация при загрузке
+      try { applyTheme(localStorage.getItem(STORAGE_KEY_THEME) || 'system'); } catch (e) { applyTheme('system'); }
       setupSettingsEvents();
       loadConfig();
+      if (window.history) history.replaceState({ aliasScreen: 'screenSettings' }, '', location.href);
     </script>
   </body>
 </html>
