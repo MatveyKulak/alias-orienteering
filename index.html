@@ -25,6 +25,10 @@
         --text-secondary: #94a3b8;
         --text-muted: #64748b;
         --border-subtle: rgba(255, 255, 255, 0.1);
+        --surface-soft: rgba(15, 23, 42, 0.45);
+        --surface-contrast: rgba(15, 23, 42, 0.6);
+        --input-soft: rgba(255, 255, 255, 0.04);
+        --on-surface: #ffffff;
         --team-1: #f97316;
         --team-2: #10b981;
         --team-3: #3b82f6;
@@ -42,6 +46,10 @@
         --text-secondary: #475569;
         --text-muted: #64748b;
         --border-subtle: rgba(15, 23, 42, 0.14);
+        --surface-soft: #f1f5f9;
+        --surface-contrast: #e2e8f0;
+        --input-soft: #ffffff;
+        --on-surface: #0f172a;
       }
 
       html[data-theme="light"] header {
@@ -59,6 +67,10 @@
           --text-secondary: #475569;
           --text-muted: #64748b;
           --border-subtle: rgba(15, 23, 42, 0.14);
+          --surface-soft: #f1f5f9;
+          --surface-contrast: #e2e8f0;
+          --input-soft: #ffffff;
+          --on-surface: #0f172a;
         }
 
         html[data-theme="system"] header {
@@ -245,7 +257,7 @@
         display: none;
         gap: 10px;
         padding: 12px;
-        background: rgba(15, 23, 42, 0.45);
+        background: var(--surface-soft);
         border: 1px solid var(--border-subtle);
         border-radius: 12px;
       }
@@ -368,7 +380,7 @@
       }
 
       .team-config-card {
-        background-color: rgba(15, 23, 42, 0.6);
+        background-color: var(--surface-contrast);
         border: 1px solid var(--border-subtle);
         border-radius: 14px;
         padding: 12px;
@@ -421,8 +433,8 @@
         max-width: 100%;
         box-sizing: border-box;
         -webkit-appearance: none;
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background-color: var(--input-soft);
+        border: 1px solid var(--border-subtle);
         border-radius: 8px;
         color: var(--text-primary);
         font-size: 0.82rem;
@@ -431,7 +443,7 @@
       }
 
       .player-input:focus {
-        border-color: rgba(255, 255, 255, 0.25);
+        border-color: var(--iof-orange);
       }
 
       /* --- ЭКРАН 2: ПЕРЕДАЧА ХОДА / ГОТОВЫ --- */
@@ -460,7 +472,7 @@
         padding: 4px 12px;
         border-radius: 20px;
         margin: 0 auto;
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--surface-contrast);
       }
 
       .ready-team-title {
@@ -495,11 +507,11 @@
 
       .role-name {
         font-weight: 800;
-        color: #ffffff;
+        color: var(--on-surface);
       }
 
       .leaderboard-mini {
-        background-color: rgba(15, 23, 42, 0.4);
+        background-color: var(--surface-contrast);
         border-radius: 12px;
         padding: 10px 14px;
         display: flex;
@@ -513,7 +525,7 @@
         justify-content: space-between;
         font-size: 0.85rem;
         padding: 4px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid var(--border-subtle);
       }
 
       .mini-lead-row:last-child {
@@ -699,7 +711,7 @@
         transition: all 0.2s ease;
         padding: 8px 16px;
         border-radius: 20px;
-        background: rgba(15, 23, 42, 0.4);
+        background: var(--surface-soft);
       }
 
       .swipe-cue-up {
@@ -761,6 +773,11 @@
         display: block;
       }
 
+      .word-card.sign-explain-mode .map-symbol-badge {
+        width: 170px;
+        height: 120px;
+      }
+
       .sign-code-tag {
         font-size: 0.74rem;
         font-weight: 800;
@@ -773,7 +790,7 @@
         font-size: 2.35rem;
         font-weight: 900;
         line-height: 1.18;
-        color: #ffffff;
+        color: var(--on-surface);
         letter-spacing: -0.02em;
         text-wrap: balance;
         max-width: 100%;
@@ -805,7 +822,7 @@
       .clue-text {
         font-size: 0.94rem;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--on-surface);
         line-height: 1.35;
       }
 
@@ -815,7 +832,7 @@
         font-size: 0.8rem;
         color: var(--text-secondary);
         padding: 6px 12px;
-        background: rgba(15, 23, 42, 0.5);
+        background: var(--surface-soft);
         border: 1px solid var(--border-subtle);
         border-radius: 10px;
       }
@@ -836,7 +853,7 @@
         font-size: 3.2rem;
         font-weight: 900;
         line-height: 1;
-        color: #ffffff;
+        color: var(--on-surface);
         font-variant-numeric: tabular-nums;
       }
 
@@ -868,7 +885,7 @@
 
       .tab-btn.active {
         background-color: var(--surface-card);
-        color: #ffffff;
+        color: var(--on-surface);
       }
 
       .cards-list-box {
@@ -884,7 +901,7 @@
       }
 
       .result-word-row {
-        background-color: rgba(15, 23, 42, 0.45);
+        background-color: var(--surface-soft);
         border: 1px solid var(--border-subtle);
         border-radius: 8px;
         padding: 8px 10px;
@@ -1086,7 +1103,7 @@
         padding: 12px;
         border: 1px solid var(--border-subtle);
         border-radius: 12px;
-        background: rgba(15, 23, 42, 0.35);
+        background: var(--surface-soft);
       }
 
       .changelog-release.current {
@@ -1142,7 +1159,7 @@
         <div class="iof-prism-icon" title="КП IOF"></div>
         <div>
           <h1 class="brand-title">Алиас: Спортивное ориентирование</h1>
-          <div class="brand-badge">ISSprOM + ISOM · β 0.4.0 · Вело- и лыжное ориентирование — в разработке</div>
+          <div class="brand-badge">ISSprOM + ISOM · β 0.5.0 · Вело- и лыжное ориентирование — в разработке</div>
         </div>
       </div>
       <div class="header-actions">
@@ -1206,8 +1223,18 @@
             <div id="standardDesc" class="diff-desc">Спринтовые знаки ISSprOM. В колоду не попадут лесные знаки ISOM.</div>
           </div>
 
-          <!-- Выбор уровня сложности -->
+          <!-- Режим тренировки: термины или непосредственное объяснение рисунка -->
           <div>
+            <label class="setting-label">Режим тренировки</label>
+            <div class="segmented-control" style="grid-template-columns: 1fr 1fr;">
+              <button type="button" class="segment-btn active" data-training="terms">Алиас терминов</button>
+              <button type="button" class="segment-btn" data-training="sign">Объясни знак</button>
+            </div>
+            <div id="trainingDesc" class="diff-desc">Объясняйте термин ориентирования, не используя однокоренные слова.</div>
+          </div>
+
+          <!-- Выбор уровня сложности -->
+          <div id="difficultyConfigBlock">
             <label class="setting-label">Уровень сложности</label>
             <div class="segmented-control" style="grid-template-columns: repeat(4, 1fr);">
               <button type="button" class="segment-btn" data-diff="ultrahard">☠ Ультра</button>
@@ -1975,8 +2002,17 @@
       const STORAGE_KEY_STATE = "orienteering_alias_active_state";
       const STORAGE_KEY_THEME = "orienteering_alias_theme";
       const STORAGE_KEY_SEEN_CHANGELOG = "orienteering_alias_seen_changelog";
-      const APP_VERSION = "0.4.0";
+      const APP_VERSION = "0.5.0";
       const CHANGELOG = [
+        {
+          version: "β 0.5.0",
+          date: "6 ноября 2026",
+          items: [
+            "Новый режим «Объясни знак»: на карточке только рисунок без названия и кода.",
+            "Рисунок знака увеличен, чтобы его было удобнее описывать по цвету, форме и штрихам.",
+            "Исправлена читаемость элементов в светлой теме."
+          ]
+        },
         {
           version: "β 0.4.0",
           date: "5 ноября 2026",
@@ -2027,6 +2063,7 @@
       // Текущие настройки
       let gameMode = "teams"; // "teams" | "solo"
       let mapStandard = "sprint"; // "sprint" | "forest"
+      let trainingMode = "terms"; // "terms" | "sign"
       let difficulty = "medium"; // "ultrahard" | "hard" | "medium" | "easy"
       let numTeams = 2;
       let playersPerTeam = 4;
@@ -2155,6 +2192,8 @@
 
       const diffDesc = document.getElementById('diffDesc');
       const standardDesc = document.getElementById('standardDesc');
+      const trainingDesc = document.getElementById('trainingDesc');
+      const difficultyConfigBlock = document.getElementById('difficultyConfigBlock');
       const teamsConfigBlock = document.getElementById('teamsConfigBlock');
       const soloConfigBlock = document.getElementById('soloConfigBlock');
       const soloPlayerOne = document.getElementById('soloPlayerOne');
@@ -2374,6 +2413,17 @@
           : 'Спринтовые знаки ISSprOM. Лесные знаки ISOM в колоду не попадут.';
       }
 
+      function updateTrainingModeUI() {
+        const isSignMode = trainingMode === 'sign';
+        document.querySelectorAll('[data-training]').forEach(button => {
+          button.classList.toggle('active', button.dataset.training === trainingMode);
+        });
+        difficultyConfigBlock.style.display = isSignMode ? 'none' : 'block';
+        trainingDesc.textContent = isSignMode
+          ? 'Объясняющий видит только рисунок. Описывайте цвет, форму, точки и штрихи — название скрыто.'
+          : 'Объясняйте термин ориентирования, не используя однокоренные слова.';
+      }
+
       function updateCustomSettingsUI() {
         document.querySelectorAll('[data-goal]').forEach(button => {
           button.classList.toggle('active', !goalCustom && button.dataset.goal === goalType && parseInt(button.dataset.val, 10) === goalValue);
@@ -2403,7 +2453,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'alias-sport-orienteering-beta-0.4.0.html';
+        link.download = 'alias-sport-orienteering-beta-0.5.0.html';
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -2447,6 +2497,14 @@
             btn.classList.add('active');
             mapStandard = btn.dataset.standard;
             updateDifficultyDescription();
+            saveConfig();
+          });
+        });
+
+        document.querySelectorAll('[data-training]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            trainingMode = btn.dataset.training === 'sign' ? 'sign' : 'terms';
+            updateTrainingModeUI();
             saveConfig();
           });
         });
@@ -2559,7 +2617,7 @@
 
       function saveConfig() {
         try {
-          const config = { gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, teamsBeforeSolo, goalType, goalValue, roundDuration, goalCustom, timeCustom };
+          const config = { gameMode, mapStandard, trainingMode, difficulty, numTeams, playersPerTeam, teams, teamsBeforeSolo, goalType, goalValue, roundDuration, goalCustom, timeCustom };
           localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
         } catch (e) {}
       }
@@ -2571,6 +2629,7 @@
             const c = JSON.parse(saved);
             if (c.gameMode) gameMode = c.gameMode;
             if (c.mapStandard === 'sprint' || c.mapStandard === 'forest') mapStandard = c.mapStandard;
+            if (c.trainingMode === 'terms' || c.trainingMode === 'sign') trainingMode = c.trainingMode;
             if (c.difficulty) difficulty = c.difficulty;
             if (c.numTeams) numTeams = c.numTeams;
             if (c.playersPerTeam >= 2 && c.playersPerTeam <= 6) playersPerTeam = c.playersPerTeam;
@@ -2603,6 +2662,7 @@
         document.querySelectorAll('[data-standard]').forEach(b => b.classList.toggle('active', b.dataset.standard === mapStandard));
         document.querySelectorAll('[data-diff]').forEach(b => b.classList.toggle('active', b.dataset.diff === difficulty));
         updateDifficultyDescription();
+        updateTrainingModeUI();
 
         document.querySelectorAll('[data-teams]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.teams, 10) === numTeams));
         document.querySelectorAll('[data-players]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.players, 10) === playersPerTeam));
@@ -2626,7 +2686,7 @@
       function saveActiveMatchState() {
         try {
           const state = {
-            gameMode, mapStandard, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration, goalCustom, timeCustom,
+            gameMode, mapStandard, trainingMode, difficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration, goalCustom, timeCustom,
             currentRoundNumber, currentTeamTurnIndex,
             deck, cardIdx, roundGuessed, roundSkipped, roundScoring, roundScoresBefore
           };
@@ -2641,6 +2701,7 @@
           const s = JSON.parse(raw);
           gameMode = s.gameMode;
           mapStandard = s.mapStandard === 'forest' ? 'forest' : 'sprint';
+          trainingMode = s.trainingMode === 'sign' ? 'sign' : 'terms';
           if (s.difficulty) difficulty = s.difficulty;
           numTeams = s.numTeams;
           if (s.playersPerTeam >= 2 && s.playersPerTeam <= 6) playersPerTeam = s.playersPerTeam;
@@ -2758,7 +2819,9 @@
         isPaused = false;
         lastWordMode = false;
         roundEnding = false;
-        swipeHelperBar.textContent = 'Свайп вверх / [↑] — Угадано • Свайп вниз / [↓] — Пропуск';
+        swipeHelperBar.textContent = trainingMode === 'sign'
+          ? 'Объясняйте цвет, форму, точки и штрихи • свайп вверх — угадано'
+          : 'Свайп вверх / [↑] — Угадано • Свайп вниз / [↓] — Пропуск';
         wordCard.querySelector('.swipe-cue-down').style.display = '';
 
         const team = teams[currentTeamTurnIndex];
@@ -2783,6 +2846,16 @@
 
         const card = deck[cardIdx];
         cardWord.textContent = card.word;
+        wordCard.classList.toggle('sign-explain-mode', trainingMode === 'sign');
+
+        if (trainingMode === 'sign') {
+          // В этом режиме объясняющий видит только сам условный знак.
+          cardVisualWrap.style.display = 'flex';
+          cardSvgBadge.innerHTML = getCurrentSignSvg(card.code);
+          cardSignCode.style.display = 'none';
+          cardWord.style.display = 'none';
+          cardEasyClue.style.display = 'none';
+        } else {
 
         // Настройка отображения в зависимости от сложности
         if (difficulty === 'ultrahard') {
@@ -2814,6 +2887,7 @@
           cardSignCode.textContent = `Знак ${card.code}`;
           cardEasyClue.style.display = 'block';
           cardClueText.textContent = card.clue || card.hint;
+        }
         }
 
         // Сброс анимаций и сдвигов карточки
@@ -2902,7 +2976,9 @@
         timerBarCircle.style.strokeDashoffset = TIMER_CIRCUMFERENCE;
         timerCircle.classList.remove('warning');
         timerCircle.classList.add('danger');
-        swipeHelperBar.textContent = 'Последнее слово ∞ — угадывает любая команда. Пропуск недоступен.';
+        swipeHelperBar.textContent = trainingMode === 'sign'
+          ? 'Последний знак ∞ — угадывает любая команда. Пропуск недоступен.'
+          : 'Последнее слово ∞ — угадывает любая команда. Пропуск недоступен.';
         wordCard.querySelector('.swipe-cue-down').style.display = 'none';
         playSound('buzzer');
       }
