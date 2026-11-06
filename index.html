@@ -170,6 +170,28 @@
         background-color: var(--surface-card);
       }
 
+      .header-action-btn {
+        width: auto;
+        padding: 0 10px;
+        gap: 6px;
+      }
+
+      .header-action-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      @media (max-width: 650px) {
+        .header-action-btn {
+          width: 36px;
+          padding: 0;
+        }
+
+        .header-action-label {
+          display: none;
+        }
+      }
+
       /* Контейнер приложения */
       main {
         flex: 1;
@@ -288,6 +310,100 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
+      }
+
+      .quick-start-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.14), rgba(249, 115, 22, 0.04));
+        border: 1px solid rgba(249, 115, 22, 0.35);
+        border-radius: 14px;
+      }
+
+      .quick-start-card.is-hidden {
+        display: none;
+      }
+
+      .quick-start-title {
+        font-size: 1rem;
+        font-weight: 850;
+        color: var(--text-primary);
+      }
+
+      .quick-start-summary {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        color: var(--text-secondary);
+      }
+
+      .quick-start-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+        gap: 8px;
+      }
+
+      .quick-preset-btn {
+        min-height: 86px;
+        padding: 12px;
+        text-align: left;
+        background: var(--surface-input);
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      }
+
+      .quick-preset-btn:hover {
+        transform: translateY(-1px);
+        border-color: var(--iof-orange);
+        background: var(--surface-contrast);
+      }
+
+      .quick-preset-btn.active {
+        background: var(--iof-orange);
+        border-color: var(--iof-orange);
+        color: #fff;
+      }
+
+      .quick-preset-title,
+      .quick-preset-desc {
+        display: block;
+      }
+
+      .quick-preset-title {
+        font-size: 0.92rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+      }
+
+      .quick-preset-desc {
+        font-size: 0.73rem;
+        line-height: 1.35;
+        color: var(--text-secondary);
+      }
+
+      .quick-preset-btn.active .quick-preset-desc {
+        color: rgba(255, 255, 255, 0.84);
+      }
+
+      .custom-match-config {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .custom-match-config.visible {
+        display: flex;
+      }
+
+      .settings-divider {
+        border: 0;
+        border-top: 1px solid var(--border-subtle);
+        width: 100%;
+        margin: 2px 0;
       }
 
       .resume-banner {
@@ -1159,24 +1275,26 @@
         <div class="iof-prism-icon" title="КП IOF"></div>
         <div>
           <h1 class="brand-title">Алиас: Спортивное ориентирование</h1>
-          <div class="brand-badge">ISSprOM + ISOM · β 0.5.0 · Вело- и лыжное ориентирование — в разработке</div>
+          <div class="brand-badge">ISSprOM + ISOM · β 0.8.0 · Вело- и лыжное ориентирование — в разработке</div>
         </div>
       </div>
       <div class="header-actions">
-        <button id="updatesBtn" class="icon-btn" title="Что нового" aria-label="Что нового" style="position: relative;">
+        <button id="updatesBtn" class="icon-btn header-action-btn" title="Что нового" aria-label="Что нового" style="position: relative;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
             <path d="M10 21h4"></path>
           </svg>
+          <span class="header-action-label">Новое</span>
           <span id="updatesDot" class="update-dot" style="display: none;"></span>
         </button>
-        <button id="themeSettingsBtn" class="icon-btn" title="Настройки оформления" aria-label="Настройки оформления">
+        <button id="themeSettingsBtn" class="icon-btn header-action-btn" title="Настройки оформления" aria-label="Настройки оформления">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V20.3h-3v-.08A1.7 1.7 0 0 0 10.66 18.66a1.7 1.7 0 0 0-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.56-1.04h-.08v-3h.08A1.7 1.7 0 0 0 7 9.92a1.7 1.7 0 0 0-.34-1.88L6.6 7.98l2.12-2.12.06.06A1.7 1.7 0 0 0 10.66 6.26a1.7 1.7 0 0 0 1.04-1.56v-.08h3v.08a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0 0 19.4 9.92a1.7 1.7 0 0 0 1.56 1.04h.08v3h-.08A1.7 1.7 0 0 0 19.4 15z"></path>
           </svg>
+          <span class="header-action-label">Настройки</span>
         </button>
-        <button id="soundToggleBtn" class="icon-btn" title="Звук (вкл/выкл)" aria-label="Звук">
+        <button id="soundToggleBtn" class="icon-btn header-action-btn" title="Звук (вкл/выкл)" aria-label="Звук">
           <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -1187,6 +1305,7 @@
             <line x1="23" y1="9" x2="17" y2="15"></line>
             <line x1="17" y1="9" x2="23" y2="15"></line>
           </svg>
+          <span class="header-action-label">Звук</span>
         </button>
       </div>
     </header>
@@ -1204,6 +1323,32 @@
             </div>
           </div>
 
+          <section id="quickStartPanel" class="quick-start-card" aria-label="Быстрый старт">
+            <div class="quick-start-title">Быстрый старт</div>
+            <div class="quick-start-summary">Спринт ISSprOM · 3 круга · 60 секунд. Выберите подходящий формат.</div>
+            <div class="quick-start-grid">
+              <button class="quick-preset-btn active" type="button" data-quick-preset="duel-terms">
+                <span class="quick-preset-title">Один на один</span>
+                <span class="quick-preset-desc">Алиас терминов · Средний</span>
+              </button>
+              <button class="quick-preset-btn" type="button" data-quick-preset="teams-terms">
+                <span class="quick-preset-title">Команды 2×2</span>
+                <span class="quick-preset-desc">Алиас терминов · Средний</span>
+              </button>
+              <button class="quick-preset-btn" type="button" data-quick-preset="duel-sign">
+                <span class="quick-preset-title">Объясни знак</span>
+                <span class="quick-preset-desc">Один на один · только рисунок</span>
+              </button>
+            </div>
+            <button id="quickStartPlayBtn" class="btn-primary" type="button">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Начать выбранную игру
+            </button>
+            <button id="toggleCustomSetupBtn" class="btn-secondary" type="button" aria-expanded="false">⚙ Настроить матч</button>
+          </section>
+
+          <div id="customMatchConfig" class="custom-match-config">
+          <button id="backToQuickStartBtn" class="btn-secondary" type="button">← К быстрому старту</button>
           <!-- Выбор режима игры -->
           <div>
             <label class="setting-label">Формат игры</label>
@@ -1327,7 +1472,7 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             Начать игру
           </button>
-          <button id="downloadGameBtn" class="btn-secondary" type="button">⇩ Скачать автономный файл игры (.html)</button>
+          </div>
         </div>
       </section>
 
@@ -1502,6 +1647,9 @@
           <button type="button" class="segment-btn" data-theme-choice="dark">Тёмная</button>
           <button type="button" class="segment-btn" data-theme-choice="light">Светлая</button>
         </div>
+        <hr class="settings-divider">
+        <p class="modal-desc">Игра без интернета</p>
+        <button id="downloadGameBtn" class="btn-secondary" type="button" style="width: 100%;">⇩ Скачать автономную копию (.html)</button>
         <button id="closeThemeModalBtn" class="btn-secondary" type="button" style="width: 100%;">Готово</button>
       </div>
     </div>
@@ -2002,8 +2150,34 @@
       const STORAGE_KEY_STATE = "orienteering_alias_active_state";
       const STORAGE_KEY_THEME = "orienteering_alias_theme";
       const STORAGE_KEY_SEEN_CHANGELOG = "orienteering_alias_seen_changelog";
-      const APP_VERSION = "0.5.0";
+      const APP_VERSION = "0.8.0";
       const CHANGELOG = [
+        {
+          version: "β 0.8.0",
+          date: "6 ноября 2026",
+          items: [
+            "Быстрые форматы теперь сначала выбираются, а матч запускается отдельной кнопкой.",
+            "При открытии подробных настроек быстрый старт скрывается; добавлена кнопка возврата.",
+            "Исправлено восстановление названий команд после режима один на один."
+          ]
+        },
+        {
+          version: "β 0.7.0",
+          date: "6 ноября 2026",
+          items: [
+            "Быстрый старт теперь предлагает три готовых формата: один на один, команды 2×2 и «Объясни знак».",
+            "Кнопки «Новое», «Настройки» и «Звук» получили понятные подписи на широком экране."
+          ]
+        },
+        {
+          version: "β 0.6.0",
+          date: "6 ноября 2026",
+          items: [
+            "Упрощён первый экран: быстрый старт запускает игру один на один с базовыми правилами.",
+            "Все подробные параметры перенесены в раскрываемый блок «Настроить матч».",
+            "Скачивание автономной копии игры перенесено в меню настроек оформления."
+          ]
+        },
         {
           version: "β 0.5.0",
           date: "6 ноября 2026",
@@ -2064,6 +2238,7 @@
       let gameMode = "teams"; // "teams" | "solo"
       let mapStandard = "sprint"; // "sprint" | "forest"
       let trainingMode = "terms"; // "terms" | "sign"
+      let selectedQuickPreset = "duel-terms";
       let difficulty = "medium"; // "ultrahard" | "hard" | "medium" | "easy"
       let numTeams = 2;
       let playersPerTeam = 4;
@@ -2189,6 +2364,11 @@
       const resumeBanner = document.getElementById('resumeBanner');
       const resumeGameBtn = document.getElementById('resumeGameBtn');
       const discardGameBtn = document.getElementById('discardGameBtn');
+      const quickStartPanel = document.getElementById('quickStartPanel');
+      const quickStartPlayBtn = document.getElementById('quickStartPlayBtn');
+      const toggleCustomSetupBtn = document.getElementById('toggleCustomSetupBtn');
+      const backToQuickStartBtn = document.getElementById('backToQuickStartBtn');
+      const customMatchConfig = document.getElementById('customMatchConfig');
 
       const diffDesc = document.getElementById('diffDesc');
       const standardDesc = document.getElementById('standardDesc');
@@ -2385,6 +2565,16 @@
         return source.map(team => ({ ...team, players: [...(team.players || [])] }));
       }
 
+      function createDefaultTeams() {
+        return DEFAULT_TEAM_NAMES.map((name, index) => ({
+          name,
+          color: TEAM_COLORS[index],
+          score: 0,
+          players: Array.from({ length: playersPerTeam }, (_, playerIndex) => `Игрок ${playerIndex + 1}`),
+          nextPlayerIdx: 0
+        }));
+      }
+
       function enterSoloMode() {
         if (!teamsBeforeSolo) teamsBeforeSolo = cloneTeams(teams);
         numTeams = 2;
@@ -2393,6 +2583,7 @@
 
       function leaveSoloMode() {
         if (teamsBeforeSolo) teams = cloneTeams(teamsBeforeSolo);
+        else teams = createDefaultTeams();
         teamsBeforeSolo = null;
         renderTeamsBuilder();
       }
@@ -2444,16 +2635,69 @@
         customTimeValue.value = roundDuration;
       }
 
+      function setCustomMatchVisible(visible) {
+        customMatchConfig.classList.toggle('visible', visible);
+        quickStartPanel.classList.toggle('is-hidden', visible);
+        toggleCustomSetupBtn.setAttribute('aria-expanded', String(visible));
+      }
+
+      function selectQuickGamePreset(preset) {
+        selectedQuickPreset = preset;
+        document.querySelectorAll('[data-quick-preset]').forEach(button => {
+          button.classList.toggle('active', button.dataset.quickPreset === selectedQuickPreset);
+        });
+      }
+
+      function applyQuickGamePreset(preset) {
+        const isTeamPreset = preset === 'teams-terms';
+        const isSignPreset = preset === 'duel-sign';
+        gameMode = isTeamPreset ? 'teams' : 'solo';
+        mapStandard = 'sprint';
+        trainingMode = isSignPreset ? 'sign' : 'terms';
+        difficulty = 'medium';
+        numTeams = 2;
+        playersPerTeam = 2;
+        teamsBeforeSolo = null;
+        teams = [0, 1].map(index => ({
+          name: isTeamPreset ? DEFAULT_TEAM_NAMES[index] : `Игрок ${index + 1}`,
+          color: TEAM_COLORS[index],
+          score: 0,
+          players: isTeamPreset ? ['Игрок 1', 'Игрок 2'] : [`Игрок ${index + 1}`],
+          nextPlayerIdx: 0
+        }));
+        goalType = 'rounds';
+        goalValue = 3;
+        roundDuration = 60;
+        goalCustom = false;
+        timeCustom = false;
+
+        document.querySelectorAll('[data-mode]').forEach(button => button.classList.toggle('active', button.dataset.mode === gameMode));
+        document.querySelectorAll('[data-standard]').forEach(button => button.classList.toggle('active', button.dataset.standard === mapStandard));
+        document.querySelectorAll('[data-diff]').forEach(button => button.classList.toggle('active', button.dataset.diff === difficulty));
+        document.querySelectorAll('[data-teams]').forEach(button => button.classList.toggle('active', parseInt(button.dataset.teams, 10) === numTeams));
+        document.querySelectorAll('[data-players]').forEach(button => button.classList.toggle('active', parseInt(button.dataset.players, 10) === playersPerTeam));
+        teamsConfigBlock.style.display = isTeamPreset ? 'block' : 'none';
+        soloConfigBlock.style.display = isTeamPreset ? 'none' : 'block';
+        if (!isTeamPreset) syncSoloPlayersUI();
+        renderTeamsBuilder();
+        updateDifficultyDescription();
+        updateTrainingModeUI();
+        updateCustomSettingsUI();
+      }
+
       function downloadOfflineGame() {
         const copy = document.documentElement.cloneNode(true);
         copy.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
         copy.querySelector('#screenSettings').classList.add('active');
-        copy.querySelector('#earlyQuitModal').classList.remove('active');
+        copy.querySelectorAll('.modal-overlay').forEach(modal => {
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+        });
         const blob = new Blob(['<!doctype html>\n' + copy.outerHTML], { type: 'text/html;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'alias-sport-orienteering-beta-0.5.0.html';
+        link.download = 'alias-sport-orienteering-beta-0.8.0.html';
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -2461,6 +2705,26 @@
       }
 
       function setupSettingsEvents() {
+        toggleCustomSetupBtn.addEventListener('click', () => {
+          setCustomMatchVisible(true);
+        });
+
+        backToQuickStartBtn.addEventListener('click', () => {
+          setCustomMatchVisible(false);
+        });
+
+        document.querySelectorAll('[data-quick-preset]').forEach(button => {
+          button.addEventListener('click', () => {
+            selectQuickGamePreset(button.dataset.quickPreset);
+          });
+        });
+
+        quickStartPlayBtn.addEventListener('click', () => {
+          applyQuickGamePreset(selectedQuickPreset);
+          saveConfig();
+          startNewMatch();
+        });
+
         // Режим: Команды vs Соло
         document.querySelectorAll('[data-mode]').forEach(btn => {
           btn.addEventListener('click', () => {
