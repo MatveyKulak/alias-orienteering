@@ -244,6 +244,13 @@
         transform: scale(0.98);
       }
 
+      .btn-primary:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
       .btn-secondary {
         background-color: var(--surface-card);
         border: 1px solid var(--border-subtle);
@@ -1022,7 +1029,7 @@
         border-radius: 8px;
         padding: 8px 10px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
         gap: 10px;
       }
@@ -1061,6 +1068,15 @@
         font-size: 0.76rem;
         color: var(--text-muted);
         line-height: 1.25;
+      }
+
+      .result-score-control {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+        min-width: 142px;
+        padding-top: 1px;
       }
 
       /* --- ЭКРАН 5: ПЬЕДЕСТАЛ ПОЧЕТА (ФИНАЛ) --- */
@@ -1200,6 +1216,29 @@
         gap: 8px;
       }
 
+      .guide-card {
+        max-width: 520px;
+        max-height: min(82dvh, 720px);
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .guide-section {
+        padding-top: 14px;
+        border-top: 1px solid var(--border-subtle);
+      }
+
+      .guide-section h4 { margin: 0 0 8px; font-size: 0.95rem; }
+      .guide-list { margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.55; }
+      .tutorial-progress { color: var(--iof-orange); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; }
+      .tutorial-example { margin: 4px 0; padding: 14px; border-radius: 12px; background: var(--surface-soft); border: 1px solid var(--border-subtle); line-height: 1.5; }
+      .tutorial-answer-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .tutorial-answer { text-align: left; padding: 10px 12px; }
+      .tutorial-answer.correct { border-color: #22c55e; background: rgba(34, 197, 94, 0.15); color: var(--text-primary); }
+      .tutorial-answer.wrong { border-color: #ef4444; background: rgba(239, 68, 68, 0.12); }
+      .tutorial-sign { width: 96px; height: 64px; margin: 10px auto 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #fff; }
+      .tutorial-sign svg { width: 84px; height: 54px; }
+
       .changelog-card {
         max-height: min(76dvh, 620px);
         overflow: hidden;
@@ -1275,10 +1314,14 @@
         <div class="iof-prism-icon" title="КП IOF"></div>
         <div>
           <h1 class="brand-title">Алиас: Спортивное ориентирование</h1>
-          <div class="brand-badge">ISSprOM + ISOM · β 0.9.0 · Вело- и лыжное ориентирование — в разработке</div>
+          <div class="brand-badge">ISSprOM + ISOM · β 0.11.0 · Вело- и лыжное ориентирование — в разработке</div>
         </div>
       </div>
       <div class="header-actions">
+        <button id="guideBtn" class="icon-btn header-action-btn" title="Как играть" aria-label="Как играть">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6"></path><path d="M12 17h.01"></path></svg>
+          <span class="header-action-label">Как играть</span>
+        </button>
         <button id="updatesBtn" class="icon-btn header-action-btn" title="Что нового" aria-label="Что нового" style="position: relative;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
@@ -1466,6 +1509,15 @@
             </div>
           </div>
 
+          <div>
+            <label class="setting-label">Пропуск карточки</label>
+            <div class="segmented-control" style="grid-template-columns: 1fr 1fr;">
+              <button type="button" class="segment-btn active" data-skip-penalty="off">Без штрафа: 0</button>
+              <button type="button" class="segment-btn" data-skip-penalty="on">Штраф: −1</button>
+            </div>
+            <div class="diff-desc">Обычно пропуск не меняет счёт. Штраф применяется к команде, чей это ход.</div>
+          </div>
+
           <!-- Время раунда -->
           <div>
             <label class="setting-label">Время раунда</label>
@@ -1570,7 +1622,7 @@
 
               <!-- Сленг и подсказка как объяснить (для режима Легкий) -->
               <div id="cardEasyClue" class="card-easy-clue" style="display: none;">
-                <div class="clue-tag">💡 Сленг и как объяснить:</div>
+                <div class="clue-tag">💡 Подсказка для Алиаса:</div>
                 <div id="cardClueText" class="clue-text"></div>
               </div>
             </div>
@@ -1665,6 +1717,49 @@
         <p class="modal-desc">Игра без интернета</p>
         <button id="downloadGameBtn" class="btn-secondary" type="button" style="width: 100%;">⇩ Скачать автономную копию (.html)</button>
         <button id="closeThemeModalBtn" class="btn-secondary" type="button" style="width: 100%;">Готово</button>
+      </div>
+    </div>
+
+    <div id="guideModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card guide-card">
+        <h3 class="modal-title">Как играть</h3>
+        <p class="modal-desc">Три режима отличаются не сложностью слов, а тем, что именно нужно объяснять.</p>
+        <div class="guide-section">
+          <h4>Алиас терминов</h4>
+          <ul class="guide-list"><li>Объясняйте реальный объект или смысл термина.</li><li>Не называйте цвет, форму, код и рисунок условного знака.</li><li>Например, для «родника»: «место, где вода выходит из земли».</li></ul>
+        </div>
+        <div class="guide-section">
+          <h4>Объясни знак</h4>
+          <ul class="guide-list"><li>Объясняйте только то, что видно на рисунке.</li><li>Здесь «синяя звёздочка» или «зелёный крест» — корректный путь.</li><li>Не называйте термин и не рассказывайте, что объект означает на местности.</li></ul>
+        </div>
+        <div class="guide-section">
+          <h4>Словосочетания</h4>
+          <ul class="guide-list"><li>Нужно объяснить обе части без однокоренных слов.</li><li>Например: «две прямые линии в лесу встретились под углом» → «пересечение просек».</li></ul>
+        </div>
+        <div class="guide-section">
+          <h4>Правила раунда</h4>
+          <ul class="guide-list"><li>Свайп вверх / ↑ — угадано; вниз / ↓ — пропуск.</li><li>Когда таймер дошёл до нуля, последнее слово разыгрывается без ограничения времени и не пропускается.</li><li>После раунда можно исправить, кому начислить балл за каждую карточку.</li></ul>
+        </div>
+        <div class="guide-section">
+          <h4>Конфиденциальность</h4>
+          <p class="modal-desc">Игра работает без аккаунта и сервера. Имена игроков, настройки и незавершённый матч сохраняются только в памяти браузера (localStorage) на этом устройстве. Они никуда не отправляются. Их можно удалить, очистив данные сайта или браузера.</p>
+        </div>
+        <div class="modal-actions">
+          <button id="startTutorialBtn" class="btn-primary" type="button">Пройти обучение</button>
+          <button id="closeGuideBtn" class="btn-secondary" type="button">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tutorialModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card guide-card">
+        <div id="tutorialProgress" class="tutorial-progress"></div>
+        <h3 id="tutorialTitle" class="modal-title"></h3>
+        <div id="tutorialBody"></div>
+        <div class="modal-actions">
+          <button id="tutorialNextBtn" class="btn-primary" type="button">Дальше</button>
+          <button id="closeTutorialBtn" class="btn-secondary" type="button">Закрыть обучение</button>
+        </div>
       </div>
     </div>
 
@@ -1867,10 +1962,14 @@
         {id:221,code:"713",word:"Пункт питания",category:"Знаки трассы",hint:"Расположение пункта питания вне КП",clue:"Фиолетовый стаканчик — вода или питание."}
       ];
       function getWordsForStandard(standard) {
-        if (standard === "sprint") return orienteeringWords.filter(item => item.code !== "106");
+        if (standard === "sprint") return orienteeringWords
+          .filter(item => item.code !== "106")
+          .map(item => ({ ...item, standard: "sprint" }));
         return [
-          ...orienteeringWords.filter(item => !FOREST_EXCLUDED_CODES.has(item.code)).map(item => ({...item, ...(FOREST_OVERRIDES[item.code] || {})})),
-          ...FOREST_ADDITIONS
+          ...orienteeringWords
+            .filter(item => !FOREST_EXCLUDED_CODES.has(item.code))
+            .map(item => ({ ...item, ...(FOREST_OVERRIDES[item.code] || {}), standard: "forest" })),
+          ...FOREST_ADDITIONS.map(item => ({ ...item, standard: "forest" }))
         ].sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
       }
 
@@ -2256,8 +2355,27 @@
       const STORAGE_KEY_THEME = "orienteering_alias_theme";
       const STORAGE_KEY_SEEN_CHANGELOG = "orienteering_alias_seen_changelog";
       const STORAGE_KEY_RECENT_PHRASES = "orienteering_alias_recent_phrases";
-      const APP_VERSION = "0.9.0";
+      const APP_VERSION = "0.11.0";
       const CHANGELOG = [
+        {
+          version: "β 0.11.0",
+          date: "11 ноября 2026",
+          items: [
+            "Полностью переработаны лёгкие подсказки к знакам Спринт · ISSprOM: теперь они объясняют объект на местности, а не рисунок символа.",
+            "Лесные знаки ISOM получили отдельные подсказки там, где их смысл или название отличается от спринта; колоды больше не смешивают тексты.",
+            "Реестр проверки теперь показывает реальные карточки лесной колоды, включая дополнительные знаки ISOM.",
+            "Быстрые форматы всегда запускаются без штрафа за пропуск; штраф −1 остаётся необязательным правилом пользовательского матча."
+          ]
+        },
+        {
+          version: "β 0.10.0",
+          date: "11 ноября 2026",
+          items: [
+            "Добавлены раздел «Как играть», интерактивное обучение из трёх шагов и информация о конфиденциальности.",
+            "В настройках матча появился необязательный режим «−1 очко за пропуск».",
+            "Лёгкий режим «Алиас терминов» больше не подсказывает рисунок знака: подсказка направляет к смыслу объекта на местности."
+          ]
+        },
         {
           version: "β 0.9.0",
           date: "7 ноября 2026",
@@ -2368,6 +2486,7 @@
       let roundDuration = 60; // 30, 60, 90
       let goalCustom = false;
       let timeCustom = false;
+      let skipPenaltyEnabled = false;
       let teamsBeforeSolo = null;
 
       // Состояние активного матча
@@ -2569,6 +2688,16 @@
       const themeSettingsBtn = document.getElementById('themeSettingsBtn');
       const themeModal = document.getElementById('themeModal');
       const closeThemeModalBtn = document.getElementById('closeThemeModalBtn');
+      const guideBtn = document.getElementById('guideBtn');
+      const guideModal = document.getElementById('guideModal');
+      const closeGuideBtn = document.getElementById('closeGuideBtn');
+      const startTutorialBtn = document.getElementById('startTutorialBtn');
+      const tutorialModal = document.getElementById('tutorialModal');
+      const tutorialProgress = document.getElementById('tutorialProgress');
+      const tutorialTitle = document.getElementById('tutorialTitle');
+      const tutorialBody = document.getElementById('tutorialBody');
+      const tutorialNextBtn = document.getElementById('tutorialNextBtn');
+      const closeTutorialBtn = document.getElementById('closeTutorialBtn');
 
       /* ==========================================================================
          УПРАВЛЕНИЕ ЭКРАНАМИ
@@ -2803,12 +2932,15 @@
         roundDuration = 60;
         goalCustom = false;
         timeCustom = false;
+        // Быстрые форматы всегда играются без штрафа за пропуск.
+        skipPenaltyEnabled = false;
 
         document.querySelectorAll('[data-mode]').forEach(button => button.classList.toggle('active', button.dataset.mode === gameMode));
         document.querySelectorAll('[data-standard]').forEach(button => button.classList.toggle('active', button.dataset.standard === mapStandard));
         document.querySelectorAll('[data-diff]').forEach(button => button.classList.toggle('active', button.dataset.diff === difficulty));
         document.querySelectorAll('[data-teams]').forEach(button => button.classList.toggle('active', parseInt(button.dataset.teams, 10) === numTeams));
         document.querySelectorAll('[data-players]').forEach(button => button.classList.toggle('active', parseInt(button.dataset.players, 10) === playersPerTeam));
+        document.querySelectorAll('[data-skip-penalty]').forEach(button => button.classList.toggle('active', button.dataset.skipPenalty === 'off'));
         teamsConfigBlock.style.display = isTeamPreset ? 'block' : 'none';
         soloConfigBlock.style.display = isTeamPreset ? 'none' : 'block';
         if (!isTeamPreset) syncSoloPlayersUI();
@@ -3002,6 +3134,14 @@
           saveConfig();
         });
 
+        document.querySelectorAll('[data-skip-penalty]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            skipPenaltyEnabled = btn.dataset.skipPenalty === 'on';
+            document.querySelectorAll('[data-skip-penalty]').forEach(item => item.classList.toggle('active', item.dataset.skipPenalty === (skipPenaltyEnabled ? 'on' : 'off')));
+            saveConfig();
+          });
+        });
+
         // Старт игры из настроек
         startSetupBtn.addEventListener('click', () => {
           startNewMatch();
@@ -3022,7 +3162,7 @@
 
       function saveConfig() {
         try {
-          const config = { gameMode, mapStandard, trainingMode, difficulty, phraseDifficulty, numTeams, playersPerTeam, teams, teamsBeforeSolo, goalType, goalValue, roundDuration, goalCustom, timeCustom };
+          const config = { gameMode, mapStandard, trainingMode, difficulty, phraseDifficulty, numTeams, playersPerTeam, teams, teamsBeforeSolo, goalType, goalValue, roundDuration, goalCustom, timeCustom, skipPenaltyEnabled };
           localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
         } catch (e) {}
       }
@@ -3046,6 +3186,7 @@
             if (c.roundDuration) roundDuration = c.roundDuration;
             if (typeof c.goalCustom === 'boolean') goalCustom = c.goalCustom;
             if (typeof c.timeCustom === 'boolean') timeCustom = c.timeCustom;
+            if (typeof c.skipPenaltyEnabled === 'boolean') skipPenaltyEnabled = c.skipPenaltyEnabled;
           }
         } catch (e) {}
 
@@ -3073,6 +3214,7 @@
         document.querySelectorAll('[data-teams]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.teams, 10) === numTeams));
         document.querySelectorAll('[data-players]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.players, 10) === playersPerTeam));
         updateCustomSettingsUI();
+        document.querySelectorAll('[data-skip-penalty]').forEach(b => b.classList.toggle('active', b.dataset.skipPenalty === (skipPenaltyEnabled ? 'on' : 'off')));
 
         renderTeamsBuilder();
         checkActiveGameSaved();
@@ -3092,7 +3234,7 @@
       function saveActiveMatchState() {
         try {
           const state = {
-            gameMode, mapStandard, trainingMode, difficulty, phraseDifficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration, goalCustom, timeCustom,
+            gameMode, mapStandard, trainingMode, difficulty, phraseDifficulty, numTeams, playersPerTeam, teams, goalType, goalValue, roundDuration, goalCustom, timeCustom, skipPenaltyEnabled,
             currentRoundNumber, currentTeamTurnIndex,
             deck, cardIdx, roundGuessed, roundSkipped, roundScoring, roundScoresBefore
           };
@@ -3118,6 +3260,7 @@
           roundDuration = s.roundDuration;
           goalCustom = Boolean(s.goalCustom);
           timeCustom = Boolean(s.timeCustom);
+          skipPenaltyEnabled = Boolean(s.skipPenaltyEnabled);
           currentRoundNumber = s.currentRoundNumber || 1;
           currentTeamTurnIndex = s.currentTeamTurnIndex || 0;
           deck = s.deck && s.deck.length ? s.deck : createDeckForCurrentMode();
@@ -3297,14 +3440,14 @@
           cardSignCode.textContent = `Знак ${card.code}`;
           cardEasyClue.style.display = 'none';
         } else {
-          // Легкий: рисунок + слово + сленг и подсказка как объяснить
+          // Легкий: рисунок + слово + безопасная подсказка по смыслу, не по рисунку.
           cardVisualWrap.style.display = 'flex';
           cardWord.style.display = '';
           cardSignCode.style.display = '';
           cardSvgBadge.innerHTML = getCurrentSignSvg(card.code);
           cardSignCode.textContent = `Знак ${card.code}`;
           cardEasyClue.style.display = 'block';
-          cardClueText.textContent = card.clue || card.hint;
+          cardClueText.textContent = getTermModeHelper(card);
         }
         }
 
@@ -3315,6 +3458,190 @@
         wordCard.style.borderColor = '';
         wordCard.style.boxShadow = '';
         wordCard.classList.remove('card-exit-guess-up', 'card-exit-skip-down', 'dragging-up', 'dragging-down');
+      }
+
+      function getTermModeHelper(card) {
+        const exact = {
+          '101': 'Линия на карте, которая показывает одинаковую высоту земли и помогает понять, где холм, склон или яма.',
+          '102': 'Одна из линий высоты, которую рисуют заметно жирнее остальных. Она повторяется через пять и помогает считать подъём.',
+          '103': 'Тонкая дополнительная линия высоты между обычными. Нужна, когда маленький бугор или ямка не помещаются на основных линиях.',
+          '112': 'Глубокое углубление с крутыми краями: окоп, след взрыва или карстовый провал.',
+          '204': 'Отдельная твёрдая глыба, которую хорошо заметно среди стволов или на склоне.',
+          '309': 'Мокрая тонкая полоска земли, где влага стоит или медленно течёт; это не широкое озеро.',
+          '312': 'Место, где вода выходит из земли и может дальше превратиться в ручеёк.',
+          '405': 'Между стволами легко двигаться: почти нет кустов, веток и других помех.',
+          '410': 'Очень густые заросли: через них продираются с большим усилием и заметно замедляются.',
+          '501': 'Ровное твёрдое покрытие под ногами: асфальт, плитка, бетон или брусчатка.',
+          '515': 'Высокая каменная или бетонная преграда, через которую нельзя безопасно перелезть.',
+          '703': 'Место на дистанции, где стоит призма и нужно отметиться.',
+          '104': 'Крутой край земли: наверху можно стоять, а сразу рядом начинается резкий спуск.',
+          '105': 'Длинная невысокая возвышенность из земли: как край старой дороги или окопа.',
+          '106': 'Старая земляная возвышенность с неровными краями, которую трудно заметить.',
+          '107': 'Узкая глубокая размытая канава в земле, которая часто сужается к своему началу.',
+          '108': 'Маленькая полоска понижения, которую сделала текущая влага: обычно её легко перепрыгнуть.',
+          '109': 'Маленькая отдельная горка или кочка посреди ровного места.',
+          '110': 'Небольшая длинная горочка: не круглая, а похожая на продолговатую кочку.',
+          '111': 'Маленькая впадинка в земле: будто кто-то аккуратно продавил грунт.',
+          '113': 'Место с множеством маленьких кочек и ямок, где ноги постоянно спотыкаются.',
+          '115': 'Заметная маленькая особенность местности, например муравейник или необычная кочка.',
+          '201': 'Высокая отвесная каменная стенка: через неё нельзя спуститься или перелезть.',
+          '202': 'Невысокий каменный край, с которого можно осторожно спуститься.',
+          '203': 'Отверстие или провал под каменной стеной, куда можно заглянуть как в нору.',
+          '205': 'Отдельная глыба выше человека, заметнее всех предметов вокруг.',
+          '206': 'Очень крупная отдельная глыба или природная башенка, хорошо видимая издалека.',
+          '207': 'Много отдельных твёрдых глыб рядом, будто их специально собрали в одном месте.',
+          '208': 'Большая площадь с множеством глыб под ногами: между ними приходится прыгать.',
+          '210': 'Щебень и галька под ногами: идти можно, но скорость сильно падает.',
+          '213': 'Место почти без травы, где под ногами светлая сыпучая почва, как на пляже или в карьере.',
+          '214': 'Твёрдая серая поверхность без почвы и стволов, выступающая наружу.',
+          '301': 'Глубокое озеро или река, которую нельзя пересечь во время дистанции.',
+          '302': 'Брод или мелкое место в реке: ноги намокнут, но пройти можно.',
+          '303': 'Небольшое углубление, наполненное после дождя, как лужа.',
+          '305': 'Узкий ручей, который можно перепрыгнуть или перейти без большого труда.',
+          '306': 'Небольшой поток, который появляется только после дождей или в определённое время года.',
+          '307': 'Очень мокрое место с топкой почвой: бежать через него нельзя или почти невозможно.',
+          '308': 'Мокрое место с кочками и мхом: пройти можно, но ноги будут вязнуть.',
+          '310': 'Сырая низинка среди стволов: под ногами влажно, но кочки и мох ещё не образовали топь.',
+          '311': 'Маленькое место, где можно набрать воду: городской питьевой кран, источник или сооружение со срубом.',
+          '313': 'Небольшая, но очень заметная точка с влагой, которую легко узнать на местности.',
+          '401': 'Луг, поле, газон или большая поляна — пространство без густых стволов.',
+          '402': 'Луг или поле, где стволы стоят по одному, как в парке или нечастом саду.',
+          '403': 'Пространство с высокой травой, кустами или неровной землёй, где сложно быстро двигаться.',
+          '404': 'То же пространство с травой и кустами, но ещё с нечасто встречающимися стволами между ними.',
+          '406': 'Стволов и кустов больше обычного: двигаться можно, но приходится замедлиться.',
+          '407': 'Кусты и ветки мешают ногам, но далеко вокруг многое различается.',
+          '408': 'Густые кусты и ветки: быстро бежать уже нельзя, приходится идти ногами.',
+          '409': 'Густые кусты заставляют идти, но направление вокруг всё ещё легко определить.',
+          '411': 'Стена из кустов или живой изгороди: через неё вообще нельзя пройти.',
+          '412': 'Поле, огород или посевы, которые люди выращивают и обычно нельзя топтать.',
+          '413': 'Ровные ряды яблонь, груш или других плодовых растений.',
+          '414': 'Растения, посаженные длинными ровными рядами: лоза, хмель или похожая культура.',
+          '415': 'Хорошо заметный край, где заканчивается одно поле или вид земли и начинается другое.',
+          '416': 'Ясная смена покрова: например стволы резко заканчиваются и начинается поле.',
+          '417': 'Один очень заметный высокий ствол с широкой кроной, стоящий сам по себе.',
+          '418': 'Одна заметная невысокая зелёная заросль, стоящая отдельно.',
+          '419': 'Необычная зелёная примета на местности, которую ориентировщики могут называть корчом.',
+          '501.1': 'Небольшой перепад высоты у твёрдого покрытия: на него можно подняться одним шагом.',
+          '501.2': 'Место у твёрдого покрытия, где с одной стороны поверхность находится ниже.',
+          '501.3': 'Твёрдое покрытие, среди которого стволы растут по одному.',
+          '505': 'Широкий путь без асфальта, по которому удобно идти.',
+          '506': 'Узкий протоптанный след в земле: заметен, но не похож на широкую дорогу.',
+          '507': 'Старая тропинка, которая то видна, то теряется в траве или лесу.',
+          '508': 'Прямая полоса в лесу, где вырублены деревья, но удобной тропы может не быть.',
+          '509.1': 'Путь для поездов: рельсы, по которым ездят вагоны и локомотивы.',
+          '509.2': 'Рельсы прямо на городской улице, по которым ездит городской вагон.',
+          '510': 'Провода на опорах над головой: канатка или подъёмник.',
+          '511': 'Крупные опоры с множеством проводов над головой.',
+          '512.1': 'Место, где дорога или тропа проходит под другим сооружением либо под землёй на короткое расстояние.',
+          '512.2': 'Длинный путь под землёй, дорогой или зданием, чтобы попасть на другую сторону шоссе.',
+          '512.3': 'Место, где один путь лежит выше другого: например мост сверху и дорога снизу.',
+          '513.1': 'Невысокая каменная или бетонная преграда, через которую можно перелезть или перешагнуть.',
+          '513.2': 'Невысокая с одной стороны преграда: с другой её край слишком высок.',
+          '516': 'Невысокая ограда, через которую при необходимости можно перелезть.',
+          '518': 'Высокая ограда, через которую перелезать запрещено или невозможно.',
+          '519': 'Калитка, лаз или специально оставленная щель в ограде.',
+          '520': 'Частный двор, клумба или другое место, куда заходить нельзя.',
+          '521': 'Капитальное строение с крышей и стенами: дом, школа, магазин или сарай.',
+          '522': 'Крыша на опорах без обычных стен: остановка или крытый проход.',
+          '522.1': 'Один отдельный столб, который держит крышу или конструкцию.',
+          '524': 'Сооружение, заметное издалека: мачта для связи или водонапорная конструкция.',
+          '525': 'Небольшая вышка или помост: например охотничья вышка в лесу.',
+          '526': 'Небольшая кучка сложенных глыб, мемориал или заметный ориентир, стоящий отдельно.',
+          '527': 'Лесные ясли: место, куда кладут еду для животных.',
+          '528': 'Длинное рукотворное сооружение: труба, желоб, кабель или другая линия.',
+          '529': 'Длинное рукотворное сооружение, через которое нельзя пройти: например высокий трубопровод.',
+          '530': 'Заметный круглый объект, например круглая клумба, колодец или маленький фонтан.',
+          '531': 'Необычный рукотворный объект, который должен быть отдельно назван на карте.',
+          '532': 'Ступени, по которым поднимаются или спускаются между разными уровнями.',
+          '601': 'Параллельные штрихи, которые помогают понять направление на север.',
+          '701': 'Фиолетовый треугольник: после него участник уже идёт по своей дистанции к первому КП.',
+          '702': 'Место, где перед стартом получают схему местности, а дальше идут к треугольнику.',
+          '704': 'Цифра возле кружка КП: она помогает понять его место по счёту на дистанции.',
+          '705': 'Соединение между КП, которое показывает, куда дальше двигаться.',
+          '706': 'Конец дистанции: место, где после последней отметки заканчивается ориентирование.',
+          '707': 'Отрезок, по которому нужно идти или бежать только по лентам судей.',
+          '708': 'Граница, которую на соревнованиях нельзя проходить насквозь.',
+          '709': 'Часть схемы местности, куда участникам нельзя заходить или бежать.',
+          '710.1': 'Специально разрешённое место, чтобы перейти через стену, забор или дорогу.',
+          '710.2': 'Целая полоса движения, по которой разрешено пройти через сложное место.',
+          '714': 'Палатка, сцена, трибуна или место, появившееся только на время соревнований.'
+        };
+        // Лесная колода ISOM совпадает со спринтом не полностью. Для изменённых
+        // знаков даём собственные детские подсказки, а не текст по совпавшему коду.
+        const forestExact = {
+          '105': 'Длинная земляная возвышенность, похожая на старый окоп или край дороги.',
+          '106': 'Старая земляная возвышенность с осыпавшимися краями, которую трудно заметить.',
+          '107': 'Узкая глубокая борозда в земле, которую вымыла текущая влага.',
+          '110': 'Маленькая длинная горочка, похожая на продолговатую кочку.',
+          '111': 'Маленькое углубление, которое на настоящей местности слишком мало для точного рисунка.',
+          '113': 'Место, где много маленьких кочек и углублений, поэтому ноги постоянно спотыкаются.',
+          '210': 'Щебень и галька под ногами: двигаться можно, но заметно медленнее.',
+          '213': 'Светлая сыпучая почва без травы, как на пляже или в карьере.',
+          '301': 'Глубокое озеро или река, которую во время дистанции нельзя пересечь.',
+          '302': 'Брод или мелкое место в реке: ноги намокнут, но пройти можно.',
+          '305': 'Узкий ручеёк, который обычно легко перепрыгнуть.',
+          '306': 'Небольшой поток, который появляется только после дождя или весной.',
+          '311': 'Место, где можно набрать влагу: городской питьевой кран, источник или сооружение со срубом.',
+          '313': 'Необычная синяя примета на местности, которую легко узнать рядом с влагой.',
+          '501': 'Ровное твёрдое покрытие под ногами: асфальт, плитка, бетон или брусчатка.',
+          '505': 'Заметный протоптанный путь, по которому удобно двигаться.',
+          '506': 'Тонкий протоптанный след в земле, заметный среди травы или стволов.',
+          '507': 'Старый след, который то виден, то теряется в траве.',
+          '508': 'Прямая полоса среди стволов, где их вырубили, но удобного пути может не быть.',
+          '510': 'Провода на опорах над головой: канатка или подъёмник.',
+          '511': 'Крупные опоры с множеством проводов над головой.',
+          '515': 'Высокая каменная или бетонная преграда, через которую нельзя безопасно перелезть.',
+          '516': 'Невысокая ограда, через которую при необходимости можно перелезть.',
+          '518': 'Высокая ограда, через которую перелезать нельзя.',
+          '519': 'Калитка, лаз или специально оставленная щель в ограде.',
+          '524': 'Сооружение, заметное издалека: мачта для связи или водонапорная конструкция.',
+          '525': 'Небольшая вышка или помост, например охотничий лабаз.',
+          '526': 'Небольшая кучка сложенных глыб, мемориал или заметный ориентир.',
+          '528': 'Длинное рукотворное сооружение: труба, желоб, кабель или другая полоса.',
+          '529': 'Длинное рукотворное сооружение, через которое нельзя пройти: например высокая труба.',
+          '530': 'Заметный круглый ориентир, например клумба, люк или небольшой фонтан.',
+          '531': 'Необычная рукотворная вещь, название которой отдельно указано на схеме местности.',
+          '701': 'Фиолетовый треугольник: после него участник уже идёт по своей дистанции к первому КП.',
+          '702': 'Место, где перед стартом получают схему местности, а дальше идут к треугольнику.',
+          '705': 'Соединение между КП, которое показывает, куда дальше двигаться.',
+          '710': 'Фиолетовые дужки показывают место, где разрешено пройти через препятствие.'
+        };
+        const forestAdditions = {
+          '114': 'Место с очень густой россыпью маленьких кочек и углублений: бежать там неудобно.',
+          '209': 'Площадь, где глыбы лежат так плотно, что между ними почти не остаётся ровной земли.',
+          '211': 'Много мелкой гальки под ногами: двигаться можно, но она сильно мешает.',
+          '212': 'Очень густая галька под ногами: идти через неё почти невозможно.',
+          '215': 'Узкая искусственная выемка с двумя твёрдыми краями, как старый военный ров.',
+          '304': 'Широкая голубая полоса, которую можно перейти или переплыть.',
+          '502': 'Широкий путь для машин с твёрдым покрытием.',
+          '503': 'Путь, по которому может ехать машина.',
+          '504': 'Лесной путь без асфальта, по которому могут ездить машины.',
+          '509': 'Путь для поездов: рельсы, по которым ездят вагоны и локомотивы.',
+          '512': 'Место, где дорога или тропа проходит под другим сооружением либо под землёй.',
+          '513': 'Каменная, бетонная или деревянная преграда с чётким краем.',
+          '514': 'Старая каменная или бетонная преграда с пропусками и неровными краями.',
+          '517': 'Старая ограда с пропусками: местами она почти исчезла.',
+          '523': 'Остатки старого дома или другого строения: видны только контуры.',
+          '602': 'Технический крестик, который нужен печати карты, а не для поиска на местности.',
+          '603': 'Число, показывающее, насколько это место выше моря.',
+          '711': 'Путь, вдоль которого участникам нельзя идти, хотя поперёк иногда можно пройти.',
+          '712': 'Место, где на соревновании дежурит врач.',
+          '713': 'Место, где на соревновании можно получить питьё или еду.'
+        };
+        const useForestHints = card.standard === 'forest' || (typeof mapStandard !== 'undefined' && mapStandard === 'forest');
+        if (useForestHints && forestAdditions[card.code]) return forestAdditions[card.code];
+        if (useForestHints && forestExact[card.code]) return forestExact[card.code];
+        if (exact[card.code]) return exact[card.code];
+        const helpers = {
+          'Рельеф': 'Форма земли под ногами: высота, склон, углубление, бугор, вал или овраг.',
+          'Камни и скалы': 'Камни и скалы на местности, а также то, насколько через них можно пройти.',
+          'Гидрография': 'Вода на местности: откуда она течёт, где стоит или выходит из земли.',
+          'Растительность': 'Лес, кусты или открытое место — и то, насколько легко через них бежать.',
+          'Искусственные объекты': 'Настоящее сооружение человека: дорога, забор, здание, лестница или другая постройка.',
+          'Технические знаки': 'Служебный элемент карты и его назначение для ориентировщика.',
+          'Знаки трассы': 'Элемент дистанции: старт, КП, финиш, запрет или направление движения.'
+        };
+        return helpers[card.category] || 'Объект или явление, которое можно увидеть на местности.';
       }
 
       function handleGuess() {
@@ -3455,8 +3782,8 @@
         const team = teams[currentTeamTurnIndex];
         roundScoresBefore = teams.map(t => t.score);
         roundScoring = [
-          ...roundGuessed.map((card, sourceIndex) => ({ card, source: 'guessed', sourceIndex, awardedTo: currentTeamTurnIndex })),
-          ...roundSkipped.map((card, sourceIndex) => ({ card, source: 'skipped', sourceIndex, awardedTo: null }))
+          ...roundGuessed.map((card, sourceIndex) => ({ card, source: 'guessed', sourceIndex, awardedTo: currentTeamTurnIndex, points: 1 })),
+          ...roundSkipped.map((card, sourceIndex) => ({ card, source: 'skipped', sourceIndex, awardedTo: skipPenaltyEnabled ? currentTeamTurnIndex : null, points: skipPenaltyEnabled ? -1 : 0 }))
         ];
         applyRoundScoring();
         team.nextPlayerIdx = (team.nextPlayerIdx + 1) % team.players.length;
@@ -3493,10 +3820,14 @@
           team.score = roundScoresBefore[index] || 0;
         });
         roundScoring.forEach(entry => {
-          if (Number.isInteger(entry.awardedTo) && teams[entry.awardedTo]) teams[entry.awardedTo].score += 1;
+          const points = typeof entry.points === 'number' ? entry.points : (Number.isInteger(entry.awardedTo) ? 1 : 0);
+          if (Number.isInteger(entry.awardedTo) && teams[entry.awardedTo]) teams[entry.awardedTo].score += points;
         });
-        const activeTeamPoints = roundScoring.filter(entry => entry.awardedTo === currentTeamTurnIndex).length;
-        roundResultPoints.textContent = activeTeamPoints;
+        const activeTeamPoints = roundScoring
+          .filter(entry => entry.awardedTo === currentTeamTurnIndex)
+          .reduce((sum, entry) => sum + (typeof entry.points === 'number' ? entry.points : 1), 0);
+        roundPlusSign.textContent = activeTeamPoints < 0 ? '−' : '+';
+        roundResultPoints.textContent = Math.abs(activeTeamPoints);
         renderRoundLeaderboard();
         saveActiveMatchState();
       }
@@ -3578,12 +3909,13 @@
                 <div class="result-word-hint">${escapeHtml(item.card.hint)}</div>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+            <div class="result-score-control">
               <div style="font-size: 0.72rem; color: var(--iof-orange); font-weight: 700; white-space: nowrap;">${isPhrase ? 'Словосочетание' : `Знак ${item.card.code}`}</div>
               <label style="font-size: 0.7rem; color: var(--text-muted);">Балл:
-                <select class="award-select" data-award-entry="${scoringIndex}" style="margin-left: 4px; max-width: 135px; background: var(--surface-input); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px;">
+                <select class="award-select" data-award-entry="${scoringIndex}" style="margin-left: 4px; max-width: 150px; background: var(--surface-input); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px;">
                   <option value="">Без очка</option>
-                  ${teams.slice(0, numTeams).map((team, index) => `<option value="${index}" ${item.awardedTo === index ? 'selected' : ''}>${escapeHtml(team.name)}</option>`).join('')}
+                  ${item.source === 'skipped' ? `<option value="penalty" ${item.points === -1 ? 'selected' : ''}>−1 ${escapeHtml(teams[currentTeamTurnIndex].name)}</option>` : ''}
+                  ${teams.slice(0, numTeams).map((team, index) => `<option value="${index}" ${item.points === 1 && item.awardedTo === index ? 'selected' : ''}>+1 ${escapeHtml(team.name)}</option>`).join('')}
                 </select>
               </label>
             </div>
@@ -3594,7 +3926,16 @@
         document.querySelectorAll('.award-select').forEach(select => {
           select.addEventListener('change', () => {
             const entry = roundScoring[parseInt(select.dataset.awardEntry, 10)];
-            entry.awardedTo = select.value === '' ? null : parseInt(select.value, 10);
+            if (select.value === 'penalty') {
+              entry.awardedTo = currentTeamTurnIndex;
+              entry.points = -1;
+            } else if (select.value === '') {
+              entry.awardedTo = null;
+              entry.points = 0;
+            } else {
+              entry.awardedTo = parseInt(select.value, 10);
+              entry.points = 1;
+            }
             applyRoundScoring();
           });
         });
@@ -3800,6 +4141,96 @@
       document.querySelectorAll('[data-theme-choice]').forEach(button => {
         button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
       });
+
+      let tutorialStep = 0;
+      let tutorialAnswered = false;
+      const tutorialSteps = [
+        {
+          title: 'Алиас терминов: смысл, не рисунок',
+          body: `<div class="tutorial-example"><strong>Помощник говорит:</strong><br>«Место, где вода выходит из земли и начинает течь».</div><p class="modal-desc">Что он объясняет правильно?</p>`,
+          answers: ['Родник', 'Синюю дугу на карте', 'Знак 312'],
+          correct: 0,
+          success: 'Верно. В этом режиме важен объект на местности — «родник». Цвет, форма и номер знака здесь не подходят.',
+          retry: 'Пока нет: это описание рисунка или его номера. Попробуйте назвать объект на местности.'
+        },
+        {
+          title: 'Объясни знак: рисунок, не смысл',
+          body: `<div class="tutorial-example"><strong>На карточке:</strong><div class="tutorial-sign">${getForestSignSvg('419')}</div></div><p class="modal-desc">Какой способ объяснения соответствует этому режиму?</p>`,
+          answers: ['«Зелёный крест»', '«Особый объект растительности»', '«Корч»'],
+          correct: 0,
+          success: 'Верно. В этом режиме как раз нужно описать видимый рисунок; смысл термина и сленг называть нельзя.',
+          retry: 'Пока нет: это название или смысл объекта. Здесь нужно описать только видимый рисунок.'
+        },
+        {
+          title: 'Словосочетания: две части',
+          body: `<div class="tutorial-example"><strong>Словосочетание:</strong> «Пересечение просек».<br><br><strong>Пример:</strong> «По прямым линиям в лесу часто бегают; когда две такие линии встречаются под углом, что это?»</div><p class="modal-desc">В словосочетаниях объясняйте обе части, не используя однокоренные слова.</p>`,
+          answers: ['Объяснить и «пересечение», и «просеки»', 'Сказать только «просека»', 'Описать картинку условного знака'],
+          correct: 0,
+          success: 'Верно. Готово: в словосочетании обе части должны быть разгаданы.',
+          retry: 'Пока нет: в этом режиме недостаточно объяснить только одну часть или описать знак.'
+        }
+      ];
+
+      function closeGuide() {
+        guideModal.classList.remove('active');
+        guideModal.setAttribute('aria-hidden', 'true');
+        try { localStorage.setItem('orienteering_alias_guide_seen_v1', 'true'); } catch (e) {}
+      }
+
+      function openGuide() {
+        guideModal.classList.add('active');
+        guideModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function renderTutorial() {
+        const step = tutorialSteps[tutorialStep];
+        tutorialAnswered = false;
+        tutorialProgress.textContent = `Обучение · шаг ${tutorialStep + 1} из ${tutorialSteps.length}`;
+        tutorialTitle.textContent = step.title;
+        tutorialBody.innerHTML = `${step.body}<div class="tutorial-answer-grid">${step.answers.map((answer, index) => `<button type="button" class="btn-secondary tutorial-answer" data-tutorial-answer="${index}">${answer}</button>`).join('')}</div><p id="tutorialFeedback" class="modal-desc" style="display:none;"></p>`;
+        tutorialNextBtn.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Завершить' : 'Дальше';
+        tutorialNextBtn.disabled = true;
+        tutorialBody.querySelectorAll('[data-tutorial-answer]').forEach(button => {
+          button.addEventListener('click', () => {
+            const chosen = Number(button.dataset.tutorialAnswer);
+            const correct = chosen === step.correct;
+            tutorialBody.querySelectorAll('[data-tutorial-answer]').forEach(answerButton => {
+              answerButton.classList.remove('correct', 'wrong');
+            });
+            button.classList.add(correct ? 'correct' : 'wrong');
+            const feedback = document.getElementById('tutorialFeedback');
+            feedback.textContent = correct ? step.success : step.retry;
+            feedback.style.display = '';
+            tutorialAnswered = correct;
+            tutorialNextBtn.disabled = !tutorialAnswered;
+          });
+        });
+      }
+
+      guideBtn.addEventListener('click', openGuide);
+      closeGuideBtn.addEventListener('click', closeGuide);
+      guideModal.addEventListener('click', event => { if (event.target === guideModal) closeGuide(); });
+      startTutorialBtn.addEventListener('click', () => {
+        closeGuide();
+        tutorialStep = 0;
+        renderTutorial();
+        tutorialModal.classList.add('active');
+        tutorialModal.setAttribute('aria-hidden', 'false');
+      });
+      tutorialNextBtn.addEventListener('click', () => {
+        if (tutorialStep >= tutorialSteps.length - 1) {
+          tutorialModal.classList.remove('active');
+          tutorialModal.setAttribute('aria-hidden', 'true');
+          return;
+        }
+        tutorialStep++;
+        renderTutorial();
+      });
+      closeTutorialBtn.addEventListener('click', () => {
+        tutorialModal.classList.remove('active');
+        tutorialModal.setAttribute('aria-hidden', 'true');
+      });
+      tutorialModal.addEventListener('click', event => { if (event.target === tutorialModal) closeTutorialBtn.click(); });
 
       function renderChangelog() {
         changelogIntro.textContent = `Версия β ${APP_VERSION}. Здесь собраны все заметные обновления игры.`;
